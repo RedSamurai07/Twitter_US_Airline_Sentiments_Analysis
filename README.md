@@ -924,8 +924,6 @@ Descriptive Statistics
 ``` python
 df.groupby('airline_sentiment')['text'].count()
 ```
-<img width="284" height="130" alt="image" src="https://github.com/user-attachments/assets/5c67e158-b419-4447-a361-91795d59cdcc" />
-
 Pie chart of the sentiment airlines
 ``` python
 
