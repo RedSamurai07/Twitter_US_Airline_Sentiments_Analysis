@@ -1539,96 +1539,52 @@ print(classification_report(y_test, y_pred, target_names=le.classes_))
 
 We notice our model performs well about 81% and the reason I haven't fine tuned it as the model performance will decrease and rely on the majority classes and missclassification of sentiments will take place. We can conclude that deep neural network like LSTM perfromed well than other machine learning models.
 
-#### Model Deployment
 
-**Steps for model deployment:**
+Model Deployment Guide:
 
-**Phase 1: The Foundation (Local Machine)**
+Stage 1: Setting Up Your Local Environment
+Begin your journey by establishing a development workspace on your computer before anything goes online. Get Python & Pip: Obtain the most recent 3.x release from python.org and confirm installation by entering python --version in your command line. Get Git: Acquire Git and register for a GitHub account, then execute git config --global user.name "Your Name" to connect your system to your profile. Get Docker Desktop: This critical software lets you bundle your application to ensure consistent behavior across your laptop and production servers. While setting this up, register for Docker Hub—it will serve as your "Container Repository."
 
-- This is where you write code and test things before they ever touch the internet. Install Python & Pip: Download the latest 3.x version from [python](python.org). Verify: Open your terminal and type `python --version.`. Install Git: Download Git and create a GitHub account. Action: Run `git config --global user.name "Your Name"` to link your machine to your identity. Install Docker Desktop: This is the most important tool. It allows you to package your code so it runs exactly the same on your laptop as it does on a server. Action: Sign up for Docker Hub while you're at it—this will be your "Container Registry."
+Stage 2: Organizing Your Workspace (Code & Dependencies)
+Structure your machine learning application properly. Build a Project Directory: Execute mkdir my-ml-app && cd my-ml-app. Configure a Virtual Environment: Execute python -m venv venv and activate using source venv/bin/activate (Mac) or .\venv\Scripts\activate (Windows).
+Purpose? This prevents conflicts between ML frameworks (such as Scikit-Learn or PyTorch) across different projects. Generate a requirements.txt: Document your dependencies here (examples: pandas, scikit-learn, flask). Deploy them via pip install -r requirements.txt. Prior to this, capture package versions by running pip list in your terminal.
+
+Stage 3: Packaging for Distribution (Containerization & Repository)
+Your code is ready; now package it for transport. Develop a Dockerfile: This script instructs Docker to fetch Python, transfer your codebase, install dependencies, and launch the model. Construct your Image: Execute docker build -t my-ml-model. Upload to Repository: Authenticate with Docker Hub through your terminal (docker login) and upload your image for cloud accessibility: docker push username/my-ml-model. Important: Within the Dockerfile, verify Python tags at hub.docker.com/_/python for containerization compatibility.
+
+tage 4: Production Launch & Workflow Automation
+Manual deployment is outdated; professionals employ automation to synchronize the production application with the source code. Cloud Infrastructure: Select a platform (such as GCP or AWS) to host your model permanently online. CI/CD Framework: Implement GitHub Actions to automate the build and deployment workflow. Each code commit to GitHub triggers automatic cloud updates. Basic Monitoring: Leverage your provider's native tools to track server performance and resource consumption.
+
+Stage 5: Cloud Infrastructure & Continuous Integration (Deployment & CI/CD)
+This stage brings your project into production. Cloud Platform Account (AWS/GCP/Azure): Choose one provider. Newcomers often find Google Cloud (GCP) or DigitalOcean more user-friendly than AWS. CI/CD (GitHub Actions): First, create a test.py file for model validation and metric visualization on MLflow.
+
+Establish a directory in your project: .github/workflows/ and within it:
+Include a .yml configuration that triggers: "Upon each GitHub code push, reconstruct my Docker image and deploy to the cloud."
+Monitoring: After the model runs on cloud infrastructure, utilize the provider's dashboard (like AWS CloudWatch) to detect errors or excessive CPU consumption.
+
+Stage 5: Performance Monitoring (Prometheus & Grafana):
+The final verification layer.
+1). Prometheus: Collects metrics from your deployed model (traffic volume, crash reports).
+2). Grafana: Interfaces with Prometheus to display dynamic, visual dashboards of your model's performance.
+
+**Implementation Steps:**
+
+- Develop code for train.py, app.py (Flask for API endpoints), Dockerfile (for containerization). Document all package versions using pip list.
+
+- Navigate to your directory: `cd folder_name`. Tip: If multiple Python versions exist, deactivate conda base: conda deactivate
+
+- Enable the environment: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows), indicated by green (venv) text.
+
+- Install dependencies: Execute `pip install -r requirements.txt`
+
+- Execute train.py to generate necessary files for Docker Hub containerization: python train.py
+
+- For image creation on Docker Hub, ensure Docker Desktop login and active engine, then build with `docker build -t sentiment-app .` and launch with `docker run -d -p 5000:5000 sentiment-app.`
+
+- To visualize model metrics on MLflow, run `mlflow ui` after successful loading.
+For GitHub test badges, install `pip install pytest pytest-cov`, create test_logic.py, and establish .github/workflows/test.yml with this configuration:
 
 
-**Phase 2: The Project Structure (Code & Environment)**
-
-- Now we organize your actual AI/ML project. Create a Project Folder: `mkdir my-ml-app && cd my-ml-app.`. Set up a Virtual Environment: * Run `python -m venv venv.` Activate it: `source venv/bin/activate (Mac) or .\venv\Scripts\activate (Windows).`
-
-Why? This keeps your ML libraries (like Scikit-Learn or PyTorch) from clashing with other projects. Create a requirements.txt: List your tools/packages here (e.g., pandas, scikit-learn, flask). Install them using `pip install -r requirements.txt.`
-before that in order to get the versions of packages you need to type on you terminal `pip list`.
-
-
-**Phase 3: The "Shipment" (Containerization & Registry)**
-
-- You have code; now you need to "box" it up. Create a Dockerfile: This is a script that tells Docker: "Hey, grab Python, copy my code, install my requirements, and start the model". Build your Image: Run `docker build -t my-ml-model` Push to Registry: Log into Docker Hub in your terminal (docker login) and push your image so the cloud can see it: docker `push username/my-ml-model.` Note: Inisde the docker file make sure to check the the website for [tags](https://hub.docker.com/_/python) for python tags for containerization purpose. 
-
-**Phase 4: Going Live & Automating**
-
-- Manual uploads are for beginners; pros use automation to ensure the "live" version of the app always matches the "code" version. Cloud Hosting: Choose a provider (like GCP or AWS) to give your model a permanent home on the internet. CI/CD Pipeline: Use GitHub Actions to automate the "Build and Push" process. Every time you save code to GitHub, the cloud updates itself automatically. Basic Oversight: Use your provider’s built-in tools to check if the server is getting too hot or running out of memory.
-
-**Phase 5: The Cloud & Automation (Deployment & CI/CD)**
-This is where your project goes "Live." Cloud Account (AWS/GCP/Azure): Pick one. For beginners, Google Cloud (GCP) or DigitalOcean is often more intuitive than AWS. CI/CD (GitHub Actions): Firstly you need to have `test.py` file to test your machine learning models and to display your metrics on the ml flow site.
-by runnig the commands 
-
-Create a folder in your project: `.github/workflows/.` under that folder you need tp
-
-Add a .yml file that says: "Every time I push code to GitHub, rebuild my Docker image and send it to the cloud."
-
-Monitoring: Once the model is running on a cloud server, use the cloud provider's built-in dashboard (like [AWS CloudWatch](https://www.google.com/aclk?sa=L&ai=DChsSEwiR8o2AxYuTAxU9pWYCHdGpHZkYACICCAEQABoCc20&ae=2&aspm=1&co=1&ase=2&gclid=Cj0KCQiAk6rNBhCxARIsAN5mQLvBCchY7WAA6YRvdKasOLYgUzh-bzOExjKKGXpl9h121CAKJv6m2CgaAk3BEALw_wcB&cid=CAASugHkaLsOwyJylyktWkPVLqqd8Lcjg1OYj9NAhBh1mGCoPguHKPVc_KBPZ4PKNY2t1BLDSBEd0S0FlDSHue2tA9SDIvrlUklP5rMsXUaWpjzojuwwppLTlUHEun8FUdRYUWTm96FkyG8y2ZctgVPLwc5_qRPD3fvGay79dnQE0fIzN50U25bGF-cFodfLm21VPoCthmmzss5FOQQQAxSjW9ixDdi2wxYr5xTS62DUF-4YG_TmIEpCaQtv9FE&cce=2&category=acrcp_v1_35&sig=AOD64_10-y4cbZy_ErCQ7ntyY2a2NIphRA&q&nis=4&adurl&ved=2ahUKEwjKqIeAxYuTAxX_zjgGHbgoK7wQ0Qx6BAgWEAE) to watch for errors or high CPU usage.
-
-**Phase 5: The "Watchtower" (Prometheus & Grafana):**
-
-This is the final checkmark on your list.
-
-1). Prometheus: This tool "scrapes" data from your running model (how many users visited? did it crash?).
-
-2). Grafana: This connects to Prometheus to show you beautiful, real-time dashboards of your model's health.
-
-Steps:
-
-- Make sure to write the code for `train.apy`, `app.py` for the purpose flask for API creation, `Dockerfile` for containerization. Also to write the down all the versions of gthe packages used in your model developoment by running it on your terminal.(`pip list`)
-
-- Acess your folder, `cd folder_name` where you have cloned it. Hint: if you have two different python version I suggest you to remove the base, by running the command on the terminal `conda deactivate`
-
-- Activate the environment: source `venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows), a green colored text of (venv) will appear onto the next path.
-
-- Install all your dependencies: by running it on the terminal `pip install -r requirements.txt`
-
-- Make sure to run the code for `train.py` to run to create the temporary files for containerization in dockerhub. `python train.py` 
-  
--  In order to build images on your docker hub, make sure to be signed in you dockerhub desktop and on the official website for the engine to be active while building the image. run the command to buidl the image that is `docker build -t sentiment-app .` and to run the image onto your desktop then run this command `docker run -d -p 5000:5000 sentiment-app`. 
-
-- Also to view the metrics of your models on ML flow site. Once it is sucessfully loaded, you need to run the command the `mlflow ui` to view the metrics of your model on the site.
- 
-- To make sure that you have your test badge on your github repo, install `pip install pytest pytest-cov` make sure to code and name it `test_logic.py` and then create a file name `.github/workflows/test.yml` in your repo and paste the below mentioned code.
-
-``` yaml
-name: Test and Coverage Badge
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-cov
-      - name: Build coverage file
-        run: |
-          pytest --cov=./ --cov-report=xml
-      - name: Create Coverage Badge
-        uses: orgoro/coverage-badge-hook@v1.0.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-```
-At the top of your README.md, add this line. It will stay gray until your first successful "Push," then it will turn green with your actual percentage:
-![Coverage](https://img.shields.io/badge/coverage-tested-green)
-
-  
- 
 ### Insights
 Based on the analysis from Twitter interactions regarding the airlines is mentioned bekow
 
