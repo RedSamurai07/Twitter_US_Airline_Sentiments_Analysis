@@ -100,36 +100,37 @@ from nltk import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from collections import Counter
 ```
-<img width="529" height="318" alt="image" src="https://github.com/user-attachments/assets/ae52ccba-9c53-4cba-a268-cc06182b097e" />
+<img width="606" height="386" alt="image" src="https://github.com/user-attachments/assets/64f3ed4f-bd05-4fb6-a798-a816be930e56" />
 
 - Loading the dataset
 ``` python
   df = pd.read_csv('Tweets.csv')
   df.head()
 ```
-<img width="1840" height="452" alt="image" src="https://github.com/user-attachments/assets/149f6dcc-cb9e-40f1-9b32-4a363b9db3ec" />
+<img width="1758" height="496" alt="image" src="https://github.com/user-attachments/assets/e445ff0c-e6c7-46c6-b1c5-17c2993e28b1" /><img width="675" height="500" alt="image" src="https://github.com/user-attachments/assets/96e46f63-e082-4f06-b6e8-642ac6b649c2" />
 
 - Dimension and Shape of the dataset
 ``` python
   df.ndim
 ```
-<img width="83" height="32" alt="image" src="https://github.com/user-attachments/assets/9eea5018-49fc-4762-9cd7-95b04f50e070" />
+<img width="128" height="44" alt="image" src="https://github.com/user-attachments/assets/67b601bf-6e26-419c-8089-8e8fc9198be4" />
 
 ``` python
 df.shape
 ```
-<img width="176" height="46" alt="image" src="https://github.com/user-attachments/assets/304dd5d1-6d6f-4566-acac-eb3394940ff3" />
+<img width="156" height="49" alt="image" src="https://github.com/user-attachments/assets/12b2341c-6b30-4e7b-ace0-1f44fe8b3f46" />
 
 - Information of the Dataset
 ``` python
 df.info()
 ```
-<img width="423" height="394" alt="image" src="https://github.com/user-attachments/assets/41aa8940-6c56-45b2-9c5d-f43ffcdb4253" />
+<img width="588" height="587" alt="image" src="https://github.com/user-attachments/assets/b72bab64-4d4d-42b9-b42f-11a554d4fa17" />
 
 - Data Cleaning and Pre-processing
 ``` python
    df.isna().sum()/len(df)*100
 ```
+<img width="428" height="405" alt="image" src="https://github.com/user-attachments/assets/2d4b8e11-de28-4242-92e4-136e4283b1a6" />
 ``` python
 df.drop_duplicates(inplace = True)
 ```
@@ -150,7 +151,7 @@ df.drop_duplicates(inplace = True)
   correct_air = df['Sub_airline'] == df['airline']
   correct_air.value_counts()
 ```
-<img width="226" height="50" alt="image" src="https://github.com/user-attachments/assets/5e62a9bb-6b61-47c5-adda-9f9c99325032" />
+<img width="283" height="76" alt="image" src="https://github.com/user-attachments/assets/f3b8bb48-7855-40c0-8bf6-e2fac3099e38" />
 
 ``` python
   df.drop('text',axis = 1, inplace = True)
@@ -160,17 +161,18 @@ df.drop_duplicates(inplace = True)
 ``` python
   df.isna().sum()/len(df)*100
 ```
+<img width="359" height="298" alt="image" src="https://github.com/user-attachments/assets/b6080468-df84-42db-97d6-c552a4c2a9d8" />
 
 Descriptive Statistics
 ``` python
   df.describe()
 ```
-<img width="831" height="275" alt="image" src="https://github.com/user-attachments/assets/5faeff86-bfef-4541-bb50-68085b99da2f" />
+<img width="854" height="306" alt="image" src="https://github.com/user-attachments/assets/fe95ab89-ec1b-473e-b7fe-dadcdc463a9c" />
 
 ``` python
   df.head()
 ```
-<img width="1802" height="334" alt="image" src="https://github.com/user-attachments/assets/d4d591c6-c318-4008-8217-d9530c49f895" />
+<img width="1763" height="315" alt="image" src="https://github.com/user-attachments/assets/a4f8c60b-b5e3-4915-b4c5-e6e9ae7d9140" />
 
 1. **Customer Loyalty & Retention**
 
@@ -178,7 +180,7 @@ Descriptive Statistics
   pd.crosstab(df['airline'],df['negativereason'])
 ```
 
-<img width="1491" height="251" alt="image" src="https://github.com/user-attachments/assets/5e32bd9a-5541-43a4-bbed-6bf32da65c00" />
+<img width="1767" height="263" alt="image" src="https://github.com/user-attachments/assets/fadbdae9-0556-43d3-94e4-de7272857625" />
 
 ``` python
   fig = plt.figure(figsize=(15,8))
@@ -188,8 +190,7 @@ Descriptive Statistics
   plt.ylabel('Count')
   plt.show()
 ```
-
-<img width="1246" height="701" alt="image" src="https://github.com/user-attachments/assets/cd2b5bcc-6a5f-4e17-8700-807c4cb9b9de" />
+<img width="1247" height="699" alt="image" src="https://github.com/user-attachments/assets/7ae4608d-d89c-444f-abb1-252251abf911" />
 
 ``` python
   df['negativereason'].value_counts().plot(kind = 'bar',color = sns.color_palette('magma'))
@@ -199,9 +200,7 @@ Descriptive Statistics
   plt.show()
   print(df['negativereason'].value_counts().reset_index())
 ```
-
-<img width="580" height="636" alt="image" src="https://github.com/user-attachments/assets/adb4b651-d183-4331-8908-dd9550d2dd25" />
-<img width="329" height="254" alt="image" src="https://github.com/user-attachments/assets/58c63801-37f7-4026-9bce-bc65a69b1644" />
+<img width="580" height="634" alt="image" src="https://github.com/user-attachments/assets/6b6fa512-04f5-4a67-846c-0406723b452e" /><img width="414" height="313" alt="image" src="https://github.com/user-attachments/assets/eec70a7b-c241-440f-bb59-7c599e874035" />
 
 ``` python
   airline_sentiment_counts = df.groupby(['airline', 'airline_sentiment']).size().unstack(fill_value=0)
@@ -228,9 +227,7 @@ Descriptive Statistics
   plt.legend()
   plt.show()
 ```
-
-<img width="562" height="236" alt="image" src="https://github.com/user-attachments/assets/6fb2a5dc-cc64-4cc8-b5f5-6af72e9c7f75" />
-<img width="562" height="543" alt="image" src="https://github.com/user-attachments/assets/76899d55-6544-40f6-8730-f50c175e0596" />
+<img width="664" height="324" alt="image" src="https://github.com/user-attachments/assets/110127c4-66f7-4159-a75f-4069a3ce644f" /><img width="563" height="541" alt="image" src="https://github.com/user-attachments/assets/0415d65e-c48a-4518-820b-080ab481e018" />
 
 ``` python
   negative_tweets_df = df[df['airline_sentiment'] == 'negative']
@@ -264,9 +261,7 @@ Descriptive Statistics
   print('\t')
   mean_confidence_by_sentiment.reset_index()
 ```
-
-<img width="859" height="547" alt="image" src="https://github.com/user-attachments/assets/90605558-4cfd-42c8-9538-d236900642ba" />
-<img width="969" height="263" alt="image" src="https://github.com/user-attachments/assets/c1070fba-4c8a-4f77-a481-ee9f98e8a9e1" />
+<img width="859" height="545" alt="image" src="https://github.com/user-attachments/assets/1c9ec163-5964-465a-b7b5-e4255f9772b0" /><img width="1162" height="300" alt="image" src="https://github.com/user-attachments/assets/3814d3e5-f208-4338-9950-885923c7ca49" />
 
 2. **Demographic & Geographic Analysis**
 
@@ -284,9 +279,7 @@ Descriptive Statistics
   print("\nSentiment distribution by User Timezone (filtered for timezones with >= 50 tweets):")
   print(timezone_sentiment_filtered)
 ```
-
-<img width="685" height="472" alt="image" src="https://github.com/user-attachments/assets/e623effc-125a-4e80-a075-e08063ec72ed" />
-<img width="677" height="325" alt="image" src="https://github.com/user-attachments/assets/c284f53f-2968-49d5-8f28-73f7607ef91d" />
+<img width="808" height="552" alt="image" src="https://github.com/user-attachments/assets/0de2663f-8bff-45fa-9a91-e4243132e46c" /><img width="802" height="385" alt="image" src="https://github.com/user-attachments/assets/ef376208-9b7b-4084-8a48-894a2ed7a372" />
 
 ``` python
   location_sentiment_proportions = location_sentiment_filtered.apply(lambda x: x / x.sum()*100, axis=1)
@@ -300,9 +293,7 @@ Descriptive Statistics
   print(timezone_sentiment_proportions.sort_values(by='negative', ascending=False).head(10))
   print(timezone_sentiment_proportions.sort_values(by='positive', ascending=False).head(10))
 ```
-
-<img width="436" height="514" alt="image" src="https://github.com/user-attachments/assets/420cb3e6-bd6e-4b6b-8b46-0cb46eb7b05f" />
-<img width="496" height="512" alt="image" src="https://github.com/user-attachments/assets/efa5e470-476d-42b9-bcb6-c97ec66c4923" />
+<img width="514" height="609" alt="image" src="https://github.com/user-attachments/assets/edee0932-2723-4d77-b306-6fa813b41b6f" /><img width="592" height="604" alt="image" src="https://github.com/user-attachments/assets/a2c929f4-acf9-47db-84fe-41151542e889" />
 
 ``` python
   location_negativereason = df.groupby(['tweet_location', 'negativereason']).size().unstack(fill_value=0)
@@ -318,10 +309,7 @@ Descriptive Statistics
   print("\nDistribution of Negative Reasons by User Timezone (filtered for timezones with >= 50 negative tweets):")
   print(timezone_negativereason_filtered.apply(lambda x: x / x.sum(), axis=1).head())
 ```
-
-<img width="837" height="492" alt="image" src="https://github.com/user-attachments/assets/6161b3dc-fdf8-4a31-922e-2f8b576da614" />
-<img width="831" height="491" alt="image" src="https://github.com/user-attachments/assets/0ca82885-8775-404a-9217-54492b8bfe81" />
-<img width="568" height="463" alt="image" src="https://github.com/user-attachments/assets/0cdc5c63-b131-4007-8e18-97e25e4bebff" />
+<img width="999" height="585" alt="image" src="https://github.com/user-attachments/assets/767d512d-e1c5-4f9b-89c4-9c80b3ba62dd" /><img width="1002" height="575" alt="image" src="https://github.com/user-attachments/assets/c4bc84dc-ae28-42e8-918a-30ff5b0c6a03" /><img width="654" height="562" alt="image" src="https://github.com/user-attachments/assets/5dc4d7bd-8be5-4886-b5c0-ac0f68f4a218" />
 
 ``` python
   # To see if they vary significantly, we can look at the top reasons in different locations/timezones
@@ -335,18 +323,7 @@ Descriptive Statistics
      print(f"\nTimezone: {timezone}")
      print(timezone_negativereason_filtered.loc[timezone].sort_values(ascending=False).head(5))
 ```
-
-<img width="693" height="434" alt="image" src="https://github.com/user-attachments/assets/8c7e7637-0355-4c79-bb6c-c77a5f9f44ee" />
-<img width="418" height="523" alt="image" src="https://github.com/user-attachments/assets/5319450b-153e-4ae8-b38f-6cbd93d973c7" />
-<img width="678" height="351" alt="image" src="https://github.com/user-attachments/assets/7c72cb73-4703-48f7-b6f1-b41c7ceb9ff8" />
-<img width="686" height="563" alt="image" src="https://github.com/user-attachments/assets/ed561db2-4f6e-4f2d-a137-ea7c5195de20" />
-<img width="418" height="521" alt="image" src="https://github.com/user-attachments/assets/c2b75602-5a39-43b1-bb3e-b30b36ddd5e4" />
-<img width="690" height="555" alt="image" src="https://github.com/user-attachments/assets/e551b86a-c2ac-484c-bb36-967ca5f82500" />
-<img width="388" height="520" alt="image" src="https://github.com/user-attachments/assets/21517d3f-b242-40c2-9923-7bce68550a46" />
-<img width="679" height="563" alt="image" src="https://github.com/user-attachments/assets/53ec43ee-8cbd-4885-9d4b-0954caf8e201" />
-<img width="412" height="524" alt="image" src="https://github.com/user-attachments/assets/d0b35301-b7b3-4dcd-ab60-7cac959ea276" />
-<img width="687" height="562" alt="image" src="https://github.com/user-attachments/assets/b91171da-29d9-410e-b339-726a986acd1f" />
-<img width="388" height="343" alt="image" src="https://github.com/user-attachments/assets/8914d0de-0546-46ea-85b7-83377ac4208f" />
+<img width="833" height="522" alt="image" src="https://github.com/user-attachments/assets/f5042f80-f2b1-48d9-8edd-75da903e53f4" /><img width="472" height="630" alt="image" src="https://github.com/user-attachments/assets/dae841a3-d65a-4a6c-b791-d815553af22a" /><img width="817" height="460" alt="image" src="https://github.com/user-attachments/assets/d78ca0a6-2fcb-4c99-97e8-d63fdfeba24c" /><img width="477" height="629" alt="image" src="https://github.com/user-attachments/assets/d9ea5fa7-b990-433e-9b44-e3941f653356" /><img width="462" height="620" alt="image" src="https://github.com/user-attachments/assets/63ba872c-221f-4f6f-88db-e4b0281597e0" /><img width="827" height="457" alt="image" src="https://github.com/user-attachments/assets/075bde92-ce4b-441e-8ffe-e3d7bbb01231" /><img width="476" height="636" alt="image" src="https://github.com/user-attachments/assets/f9c5d678-21a8-4eb3-831b-c52bd78df3b5" /><img width="812" height="661" alt="image" src="https://github.com/user-attachments/assets/11e10c22-3ced-4dd8-bfde-2f6460b81e92" /><img width="457" height="595" alt="image" src="https://github.com/user-attachments/assets/1d669511-0947-44b9-9253-b4f418372a91" /><img width="820" height="664" alt="image" src="https://github.com/user-attachments/assets/b62fbbe3-c7b2-40fb-8e53-491137c04216" /><img width="464" height="628" alt="image" src="https://github.com/user-attachments/assets/58542eba-13fb-40b5-9714-d60edeab1ac0" />
 
 ``` python
   negative_reason_to_compare = 'Customer Service Issue'
@@ -368,8 +345,7 @@ Descriptive Statistics
      plt.xticks(rotation=90)
      plt.show()
 ```
-<img width="1229" height="798" alt="image" src="https://github.com/user-attachments/assets/9e8490c6-41e0-47ca-b0da-d62f49c4a075" />
-<img width="1229" height="885" alt="image" src="https://github.com/user-attachments/assets/07333a26-1f9c-4728-b1ad-876ce97e2cf5" />
+<img width="1229" height="796" alt="image" src="https://github.com/user-attachments/assets/be24612b-bf41-4a18-b7dd-355d3929edeb" /><img width="1229" height="883" alt="image" src="https://github.com/user-attachments/assets/7f7dd85f-3dd9-492b-9bbc-39cebe87c926" />
 
 ``` python
   airline_location_sentiment = df.groupby(['airline', 'tweet_location', 'airline_sentiment']).size().unstack(fill_value=0)
@@ -414,100 +390,17 @@ Descriptive Statistics
           plt.tight_layout()
           plt.show()
 ```
+<img width="720" height="709" alt="image" src="https://github.com/user-attachments/assets/62ddc205-5289-491d-9e6e-3e5158db8b31" /><img width="990" height="790" alt="image" src="https://github.com/user-attachments/assets/a84b11ce-d581-4682-b311-a5a61cce0d55" /><img width="990" height="790" alt="image" src="https://github.com/user-attachments/assets/749cee8d-3e3d-4f91-b2ff-ee2994a4a5ca" />
 
-<img width="602" height="591" alt="image" src="https://github.com/user-attachments/assets/d3436971-cf0a-4f15-a2a0-c57296699137" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/94800f4d-3a3a-44f5-bcd5-775f1daa9c7f" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/0c7d7dcc-d723-4f5a-a052-38b4720510e5" />
+<img width="709" height="701" alt="image" src="https://github.com/user-attachments/assets/f275d2e5-3220-421c-ab2f-39293687d1f5" /><img width="990" height="790" alt="image" src="https://github.com/user-attachments/assets/d2438054-a55d-4b19-b56d-9878f0d64f45" /><img width="990" height="790" alt="image" src="https://github.com/user-attachments/assets/972018a3-f284-425b-acb9-e818ef4f0803" />
 
-<img width="580" height="586" alt="image" src="https://github.com/user-attachments/assets/7c656320-7053-4bcd-8748-fa801fea71cf" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/a9328611-d8d7-4f27-a56d-ac4ec509ede3" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/44c264a2-7c7d-434e-ac22-a25f0d463c04" />
+<img width="733" height="459" alt="image" src="https://github.com/user-attachments/assets/380896ea-9dc7-4fab-961a-b62cdece0dea" /><img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/dba66051-1d9f-4e9e-a2f9-141b011af846" /><img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/d54089b4-ef75-4c61-ad1b-a90aac5824e1" />
 
-<img width="619" height="388" alt="image" src="https://github.com/user-attachments/assets/1e74b103-e45a-49bd-a586-dde13ce99a43" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/6d73adee-fb34-49e2-98bc-80fe9891203e" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/c5f4a4da-7c69-4e38-9061-a73fc85f76a0" />
+<img width="747" height="603" alt="image" src="https://github.com/user-attachments/assets/e5dd580d-be5c-41e7-a14d-9cee934ce0cc" /><img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/683258c9-e0a1-4942-a849-0a134b5134c2" /><img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/add33b26-c175-4f5c-b716-8c59acbf5af5" />
 
-<img width="629" height="504" alt="image" src="https://github.com/user-attachments/assets/710d2906-80ea-466c-a7d8-994ea1602d57" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/2d068a90-187f-4514-8e1a-b3325d83ede0" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/89f729b0-3822-4f3a-8a30-c5d6de4ee15c" />
+<img width="700" height="697" alt="image" src="https://github.com/user-attachments/assets/ce16e436-85a6-4f6e-9314-133e72f488c5" /><img width="990" height="790" alt="image" src="https://github.com/user-attachments/assets/4da4bae4-dd08-4657-bada-d3a6eefb627c" /><img width="990" height="790" alt="image" src="https://github.com/user-attachments/assets/9e682b0a-b866-4fcd-92aa-c72917720b95" />
 
-<img width="589" height="597" alt="image" src="https://github.com/user-attachments/assets/7202d494-72d9-44a7-aa23-32054b9235d8" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/bc41a769-36e5-4dc0-832f-6b01ef8db0da" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/93734421-1049-406b-83a3-c9d3f3c9f858" />
-
-<img width="655" height="237" alt="image" src="https://github.com/user-attachments/assets/d51dd788-6eaa-43ec-b33b-3432a81d8911" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/adff1c6a-8267-446e-a03a-cb1f4acdeae1" />
-<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/cb67637c-6be8-4a61-8dd9-31684cb43cbc" />
-
-``` python
-  # To Analyze sentiment for each airline in specific timezones
-  airline_timezone_sentiment = df.groupby(['airline', 'user_timezone', 'airline_sentiment']).size().unstack(fill_value=0)
-  min_tweets_timezone_airline = 10
-  airline_timezone_sentiment_filtered = airline_timezone_sentiment[airline_timezone_sentiment.sum(axis=1) >= min_tweets_timezone_airline]
-  airline_timezone_sentiment_proportions = airline_timezone_sentiment_filtered.apply(lambda x: x / x.sum() * 100, axis=1)
-
-  for airline_to_analyze in airline_timezone_sentiment_proportions.index.get_level_values('airline').unique():
-      print(f"\nAnalyzing sentiment performance for {airline_to_analyze} in specific timezones:")
-
-      airline_data_tz = airline_timezone_sentiment_proportions.loc[airline_to_analyze]
-
-      # Timezones with highest positive sentiment proportion for the airline
-      top_positive_timezones = airline_data_tz.sort_values(by='positive', ascending=False).head(10)
-      print(f"\nTop 10 timezones for {airline_to_analyze} with highest positive sentiment proportion:")
-      print(top_positive_timezones[['positive', 'negative', 'neutral']])
-
-      # Timezones with highest negative sentiment proportion for the airline
-      top_negative_timezones = airline_data_tz.sort_values(by='negative', ascending=False).head(10)
-      print(f"\nTop 10 timezones for {airline_to_analyze} with highest negative sentiment proportion:")
-      print(top_negative_timezones[['positive', 'negative', 'neutral']])
-
-      if not top_positive_timezones.empty:
-          plt.figure(figsize=(15, 8))
-          top_positive_timezones[['positive', 'negative', 'neutral']].plot(kind='bar', stacked=True, ax=plt.gca(), color = sns.color_palette('viridis'))
-          plt.title(f'Sentiment Distribution for {airline_to_analyze} in Top 10 Timezones (by Positive Sentiment)')
-          plt.xlabel('User Timezone')
-          plt.ylabel('Proportion (%)')
-          plt.xticks(rotation=90)
-          plt.legend(title='Sentiment')
-          plt.tight_layout()
-          plt.show()
-
-      if not top_negative_timezones.empty:
-          plt.figure(figsize=(15, 8))
-          top_negative_timezones[['positive', 'negative', 'neutral']].plot(kind='bar', stacked=True, ax=plt.gca(), color = sns.color_palette('plasma'))
-          plt.title(f'Sentiment Distribution for {airline_to_analyze} in Top 10 Timezones (by Negative Sentiment)')
-          plt.xlabel('User Timezone')
-          plt.ylabel('Proportion (%)')
-          plt.xticks(rotation=90)
-          plt.legend(title='Sentiment')
-          plt.tight_layout()
-          plt.show()
-```
-
-![image](https://github.com/user-attachments/assets/d362c39e-7de8-4e58-ac97-0c39958a6cfc)
-![image](https://github.com/user-attachments/assets/dfffa998-fe50-4a60-a7b4-15d9f5de0ace)
-![image](https://github.com/user-attachments/assets/a6ce748e-fa85-4d8b-8850-644ff0cae14b)
-
-
-![image](https://github.com/user-attachments/assets/29cfa98f-bc4f-4964-8bf9-916d7c73a0f3)
-![image](https://github.com/user-attachments/assets/65488fb7-a2ee-47d4-8fc5-64c3fd45a5ea)
-![image](https://github.com/user-attachments/assets/d71dd0c8-7492-4bdb-b495-7c910b3d7e80)
-
-![image](https://github.com/user-attachments/assets/e102116f-b8d7-4e89-a20a-5b2840d1e52c)
-![image](https://github.com/user-attachments/assets/80243571-9056-4657-bebf-60f7ebd541b4)
-![image](https://github.com/user-attachments/assets/48c767bd-43e9-4356-b38c-854e00612a32)
-
-![image](https://github.com/user-attachments/assets/6f1d305a-1a3a-4613-bfe0-565703ce2711)
-![image](https://github.com/user-attachments/assets/9ec159a2-2262-461a-906f-b0ad4511bf2a)
-![image](https://github.com/user-attachments/assets/ab4c4a37-4865-405d-a10b-684ac387ca22)
-
-![image](https://github.com/user-attachments/assets/53125458-f991-4e41-8383-5a010eaec219)
-![image](https://github.com/user-attachments/assets/7f94400e-bbaf-4e88-a45a-b5aeda9b0b60)
-![image](https://github.com/user-attachments/assets/b21a2f5a-a2e1-48c3-b1cd-8e370102ef4f)
-
-![image](https://github.com/user-attachments/assets/a2266060-c4a0-46dc-97df-928629847c23)
-![image](https://github.com/user-attachments/assets/1eab1284-88ac-442f-87b6-9cd9d50d2fad)
-![image](https://github.com/user-attachments/assets/02a7a73d-9bc1-419a-b04c-a94f411a1cb1)
+<img width="780" height="271" alt="image" src="https://github.com/user-attachments/assets/36d08ba5-cdda-497d-9f69-d51fd754d62e" /><img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/192b4a33-c6b2-4b5d-aa12-5f72e45ed71b" /><img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/0a7c6190-6c03-49e6-9ce3-681dec23ed8f" />
 
 ``` python
   timezone_tweet_volume = df['user_timezone'].value_counts().reset_index()
@@ -547,10 +440,7 @@ Descriptive Statistics
   print(timezone_sentiment_proportions.sort_values(by='negative', ascending=False).head()) # Timezones with highest negative proportion
   print(timezone_sentiment_proportions.sort_values(by='positive', ascending=False).head()) # Timezones with highest positive proportion
 ```
-
-<img width="1490" height="790" alt="image" src="https://github.com/user-attachments/assets/b1b0d2a3-4305-4ae6-b208-d1fcad924e90" />
-<img width="1489" height="790" alt="image" src="https://github.com/user-attachments/assets/7eeeefce-382d-423d-8686-42d1e5fd7afb" />
-<img width="679" height="311" alt="image" src="https://github.com/user-attachments/assets/c2894b66-c21f-4710-aaa3-5289d1c9f871" />
+<img width="1489" height="790" alt="image" src="https://github.com/user-attachments/assets/e667679b-de81-46e8-aa8b-8ae7c73a6bbd" /><img width="1489" height="790" alt="image" src="https://github.com/user-attachments/assets/74c2042d-a9f4-4290-ab4b-e982a08749d6" /><img width="802" height="370" alt="image" src="https://github.com/user-attachments/assets/772d1736-7b56-4d9f-9854-395ec8da429a" />
 
 3. **Program Effectiveness & Customer Behavior**
 
@@ -566,9 +456,7 @@ Descriptive Statistics
   plt.ylabel('Average Retweet Count')
   plt.show()
 ```
-
-<img width="349" height="123" alt="image" src="https://github.com/user-attachments/assets/2ff42476-241e-42c7-ab9c-41bd143b9d13" />
-<img width="700" height="547" alt="image" src="https://github.com/user-attachments/assets/d74461a9-b74e-49fc-b592-ce0a13f5e9b0" />
+<img width="338" height="136" alt="image" src="https://github.com/user-attachments/assets/228ffbe6-85cf-4a53-bd55-aea11c1aae9e" /><img width="700" height="545" alt="image" src="https://github.com/user-attachments/assets/22a6d122-e551-421d-895e-01903f560e58" />
 
 ``` python
   sentiment_counts = df['airline_sentiment'].value_counts()
@@ -579,7 +467,7 @@ Descriptive Statistics
   plt.show()
 ```
 
-<img width="724" height="658" alt="image" src="https://github.com/user-attachments/assets/0b4ed707-ba5c-4f16-91f9-3b154d7fdfff" />
+<img width="724" height="656" alt="image" src="https://github.com/user-attachments/assets/01f2095c-c5c8-46ee-a45d-c04dce601422" />
 
 ``` python
   df['tweet_created'] = pd.to_datetime(df['tweet_created'])
@@ -650,17 +538,8 @@ Descriptive Statistics
   plt.show()
 ```
 
-<img width="337" height="202" alt="image" src="https://github.com/user-attachments/assets/d9cea4e3-932e-46f2-99c5-a9bcc382ea58" />
-<img width="859" height="547" alt="image" src="https://github.com/user-attachments/assets/dad83f43-676f-48e5-a460-037f661d6529" />
+<img width="411" height="249" alt="image" src="https://github.com/user-attachments/assets/99c274ff-d5bb-41d4-9a99-efa64f24c43a" /><img width="859" height="545" alt="image" src="https://github.com/user-attachments/assets/809de1ae-8b86-4e8c-9899-cabf46c79cf9" /><img width="423" height="644" alt="image" src="https://github.com/user-attachments/assets/67ddb0e5-a298-4cf0-b7b6-0df8ee771109" /><img width="1005" height="545" alt="image" src="https://github.com/user-attachments/assets/7a3d2aea-6769-44c1-a0ae-4fc78faabbab" /><img width="504" height="244" alt="image" src="https://github.com/user-attachments/assets/4daa6663-9f0d-4d9b-8345-1568414b354f" /><img width="1001" height="545" alt="image" src="https://github.com/user-attachments/assets/af243dbb-4c02-495f-a252-5d30613e96a3" /><img width="483" height="645" alt="image" src="https://github.com/user-attachments/assets/4dc725dc-d138-4f45-90f9-69155c1dfa44" /><img width="1019" height="545" alt="image" src="https://github.com/user-attachments/assets/8e872e0b-9a66-4f84-b015-2de4b5461fb0" />
 
-<img width="348" height="538" alt="image" src="https://github.com/user-attachments/assets/11bd96ad-9399-4e06-b494-e2ac35d4df08" />
-<img width="1005" height="547" alt="image" src="https://github.com/user-attachments/assets/3bc37363-12f3-421a-9319-d66c0fda6446" />
-
-<img width="411" height="200" alt="image" src="https://github.com/user-attachments/assets/d11133c7-33ce-4fca-a5f2-c41f7aa308ca" />
-<img width="1001" height="547" alt="image" src="https://github.com/user-attachments/assets/b53d3a4c-f9a8-4454-b0e0-72058b871d48" />
-
-<img width="426" height="538" alt="image" src="https://github.com/user-attachments/assets/e8fb8b53-ea3b-46eb-b3cc-0dc1d2cec9f2" />
-<img width="1018" height="547" alt="image" src="https://github.com/user-attachments/assets/4c1479b9-aa99-4cd0-983a-d17caf9fd541" />
 
 ### Hypothesis testing:
 
@@ -702,8 +581,7 @@ Descriptive Statistics
       print(f"\nConclusion: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis.")
       print("There is not enough evidence to suggest that the frequency of negative reasons is not uniformly distributed. The observed distribution is consistent with a uniform distribution.")
 ```
-
-<img width="900" height="480" alt="image" src="https://github.com/user-attachments/assets/72f9a7b2-2b39-44a4-86ad-e750e18d9280" />
+<img width="1061" height="572" alt="image" src="https://github.com/user-attachments/assets/37b9bb2a-879e-4bca-93c3-c055dd001a53" />
 
 - Which airlines receive the highest proportion of negative sentiment tweets, and which receive the most positive?
 
@@ -729,14 +607,14 @@ Descriptive Statistics
      print(f"\nConclusion: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
      print("There is not enough evidence to suggest a significant difference in the proportion of sentiment tweets across different airlines. The observed distribution is consistent with independence between    airline and sentiment.")
 ```
-
-<img width="1172" height="374" alt="image" src="https://github.com/user-attachments/assets/edd0241a-12df-44ff-9193-4281b5ab4665" />
+<img width="1381" height="411" alt="image" src="https://github.com/user-attachments/assets/ff3c8ba6-28a8-49df-b781-c674679ae90e" />
 
 - Is there a correlation between the airline_sentiment_confidence and the likelihood of a tweet being negative?
 
 ``` python
   # Null Hypothesis (H0): There is no statistical correlation between airline_sentiment_confidence and the likelihood of a tweet being negative.
   # Alternative Hypothesis (H1): There is a statistical correlation between airline_sentiment_confidence and the likelihood of a tweet being negative.
+
   from scipy.stats import pearsonr
   correlation, p_value_correlation = pearsonr(df['airline_sentiment_confidence'], df['is_negative'])
 
@@ -764,8 +642,7 @@ Descriptive Statistics
   direction = "positive" if correlation > 0 else "negative" if correlation < 0 else "no"
   print(f"The correlation coefficient ({correlation:.4f}) indicates a {strength} {direction} linear relationship.")
 ```
-
-<img width="1354" height="174" alt="image" src="https://github.com/user-attachments/assets/acca7a8f-d14e-4a22-9421-49bb08365551" />
+<img width="1565" height="171" alt="image" src="https://github.com/user-attachments/assets/a27f71d2-beb7-4d0c-af38-50fa4657215c" />
 
 2. Demographic & Geographic Analysis
 
@@ -803,49 +680,7 @@ Descriptive Statistics
        print(f"\nNot enough data for {airline_name} to perform a reliable Chi-Squared test on the combined location/timezone and sentiment relationship with the applied filter.")
        print(f"Filtered table shape: {contingency_table_filtered.shape}")
 ```
-
-![image](https://github.com/user-attachments/assets/05bb6a6f-ec5d-4b88-87f8-030a8ed8d114)
-
-- Do the common negativereasons vary significantly by geographic region or user timezone?
-
-``` python
-  # Null Hypothesis (H0): The distribution of sentiment (negative/positive) for a given airline is independent of tweet_location and user_timezone.
-  # Alternative Hypothesis (H1): The distribution of sentiment (negative/positive) for a given airline is dependent on tweet_location or user_timezone, indicating a higher concentration of specific sentiments in   certain areas/timezones.
-
-  negative_df = df[df['airline_sentiment'] == 'negative'].copy()
-  min_timezone_negative_tweets = 50
-  min_negativereason_count = 20
-
-  timezone_reason_contingency = pd.crosstab(negative_df['user_timezone'], negative_df['negativereason'])
-  timezone_reason_contingency_filtered_tz = timezone_reason_contingency[timezone_reason_contingency.sum(axis=1) >= min_timezone_negative_tweets]
-
-  timezone_reason_contingency_filtered = timezone_reason_contingency_filtered_tz.loc[:, timezone_reason_contingency_filtered_tz.sum(axis=0) >= min_negativereason_count]
-
-  print("\nContingency Table (User Timezone vs. Negative Reason - filtered):")
-  print(timezone_reason_contingency_filtered.head()) # Print head as the table can be large
-
-  if not timezone_reason_contingency_filtered.empty and timezone_reason_contingency_filtered.shape[0] > 1 and timezone_reason_contingency_filtered.shape[1] > 1:
-    print("\nPerforming Chi-Squared Test for Independence (User Timezone vs. Negative Reason)")
-    chi2_stat, p_value, dof, expected = chi2_contingency(timezone_reason_contingency_filtered)
-
-    print(f"Chi-squared statistic: {chi2_stat:.4f}")
-    print(f"P-value: {p_value:.4f}")
-    print(f"Degrees of Freedom: {dof}")
-
-    alpha = 0.05
-    if p_value < alpha:
-       print(f"\nConclusion: With a p-value of {p_value:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
-       print("There is sufficient evidence to suggest that the distribution of common negative reasons varies significantly by user_timezone.")
-    else:
-       print(f"\nConclusion: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
-       print("There is not enough evidence to suggest that the distribution of common negative reasons varies significantly by user_timezone. The observed distribution is consistent with independence.")
-  else:
-     print("\nNot enough data in the filtered contingency table (User Timezone vs. Negative Reason) to perform a reliable Chi-Squared test.")
-     print(f"Filtered table shape: {timezone_reason_contingency_filtered.shape}")
-```
-
-<img width="601" height="488" alt="image" src="https://github.com/user-attachments/assets/c051c2e5-0a42-49a2-b465-8c4061c7cd20" />
-<img width="1028" height="463" alt="image" src="https://github.com/user-attachments/assets/8fc46ccf-764a-45fa-9ce6-966bcac1c84b" />
+<img width="698" height="575" alt="image" src="https://github.com/user-attachments/assets/b8de3903-6240-48e6-a1c8-88d7c156ccf5" /><img width="1233" height="565" alt="image" src="https://github.com/user-attachments/assets/1bb5c1da-0309-47e4-9f2a-1ffba3cee56f" />
 
 - Which airlines demonstrate stronger or weaker sentiment performance in specific geographic areas?
 
@@ -878,9 +713,7 @@ Descriptive Statistics
     print(f"Not enough data for {airline_name} in the filtered contingency table (Tweet Location vs. Sentiment) to perform a reliable Chi-Squared test.")
     print(f"Filtered table shape: {location_sentiment_contingency_filtered.shape}")
 ```
-
-<img width="1169" height="507" alt="image" src="https://github.com/user-attachments/assets/63427ca2-19fb-4026-9d2e-503c8dfa4f7c" />
-<img width="1141" height="512" alt="image" src="https://github.com/user-attachments/assets/754165a2-e625-4e90-aa52-45d53a9e530e" />
+<img width="1398" height="694" alt="image" src="https://github.com/user-attachments/assets/ad4fce17-3ae1-4c86-9e41-abd7c6ac824d" />
 
 - How does the volume of tweets and the sentiment distribution differ across various user_timezones?
 
@@ -951,13 +784,11 @@ Descriptive Statistics
       print("Based on the Chi-Squared tests, we fail to reject the Null Hypothesis (H0).")
       print("There is not enough evidence to suggest that the volume of tweets or the sentiment distribution differ significantly across user_timezones.")
 ```
-
-<img width="942" height="335" alt="image" src="https://github.com/user-attachments/assets/340a6b42-99c7-4525-9016-35fe3a68cb86" />
-<img width="1051" height="476" alt="image" src="https://github.com/user-attachments/assets/82822aee-5afa-44f7-94e6-e6a1cd2f8209" />
+<img width="1123" height="649" alt="image" src="https://github.com/user-attachments/assets/83a82d40-c7f7-4c14-947d-3a4418ea5830" /><img width="1258" height="226" alt="image" src="https://github.com/user-attachments/assets/ff7a08bd-1321-49ad-8ff9-3ec1d22c1ce8" />
 
 3. Program Effectiveness & Customer Behavior
 
-How does the retweet_count differ for tweets with positive, neutral, and negative sentiments?
+- How does the retweet_count differ for tweets with positive, neutral, and negative sentiments?
 
 ``` python
   # Null Hypothesis (H0): There is no significant difference in the mean retweet_count among tweets with positive, neutral, and negative sentiments.
@@ -1068,9 +899,7 @@ How does the retweet_count differ for tweets with positive, neutral, and negativ
       print(f"Filtered table shape: {contingency_table_hour_sentiment_filtered.shape}")
 ```
 
-<img width="1232" height="416" alt="image" src="https://github.com/user-attachments/assets/a99f3009-c69c-4d36-9ec0-6144c3574051" />
-<img width="1042" height="308" alt="image" src="https://github.com/user-attachments/assets/be8508a2-d291-4e33-b3cd-79ad98069457" />
-
+<img width="1474" height="698" alt="image" src="https://github.com/user-attachments/assets/b3e7c84c-c2b9-4fde-8d7f-dd125681a926" /><img width="716" height="127" alt="image" src="https://github.com/user-attachments/assets/a17433fc-e9b0-4c51-aebe-f7ac857bc4fc" />
 
 - Are there specific days or times (tweet_created) when negative sentiment tweets are more prevalent, suggesting periods of heightened
 ``` python
@@ -1088,16 +917,14 @@ How does the retweet_count differ for tweets with positive, neutral, and negativ
       print("There is not enough evidence to suggest that the proportion of negative sentiment tweets varies significantly across different days of the week or times of the day.")
       print("The observed distribution is consistent with the Null Hypothesis (H0) that the proportion is consistent.")
   ```
-
-<img width="1368" height="115" alt="image" src="https://github.com/user-attachments/assets/79e3a8e6-b551-4f3a-a89d-af457e9d2976" />
-
+<img width="1641" height="112" alt="image" src="https://github.com/user-attachments/assets/a8e4ce7c-15d8-4cfc-b54e-24cae408ffd6" />
 
 **2). Machine learning Approach**
 
 ``` python
 df.groupby('airline_sentiment')['text'].count()
 ```
-<img width="230" height="110" alt="image" src="https://github.com/user-attachments/assets/cf57b44f-3a70-4547-a0db-d903a59462c4" />
+<img width="284" height="130" alt="image" src="https://github.com/user-attachments/assets/5c67e158-b419-4447-a361-91795d59cdcc" />
 
 Pie chart of the sentiment airlines
 ``` python
@@ -1109,16 +936,11 @@ fig = px.pie(values=sentiment_counts.values,
              hole=0.3)
 fig.show()
 ```
-
-<img width="1717" height="426" alt="image" src="https://github.com/user-attachments/assets/6fa4ed0e-6592-4489-8fba-c23e0d424964" />
-
 Outlook of the texts
 
 ``` python
 df['text']
 ```
-<img width="480" height="254" alt="image" src="https://github.com/user-attachments/assets/20b10076-cb96-493c-96ba-94eef4530657" />
-
 Text cleaning
 
 ``` python
