@@ -1592,7 +1592,7 @@ Steps:
 
 - Install all your dependencies: by running it on the terminal `pip install -r requirements.txt`
 
-- Make sure to run the code for `train.py` to run to create the temporary files for containerization in dockerhub.
+- Make sure to run the code for `train.py` to run to create the temporary files for containerization in dockerhub. `python train.py` 
   
 -  In order to build images on your docker hub, make sure to be signed in you dockerhub desktop and on the official website for the engine to be active while building the image. run the command to buidl the image that is `docker build -t sentiment-app .` and to run the image onto your desktop then run this command `docker run -d -p 5000:5000 sentiment-app`. 
 
