@@ -936,6 +936,7 @@ fig = px.pie(values=sentiment_counts.values,
              hole=0.3)
 fig.show()
 ```
+
 Outlook of the texts
 
 ``` python
@@ -959,25 +960,19 @@ def comprehensive_clean(text):
 
 df['cleaned_text'] = df['text'].apply(comprehensive_clean)
 ```
-
 ``` python
 df['cleaned_text']
 ```
-<img width="489" height="248" alt="image" src="https://github.com/user-attachments/assets/a9f28c77-68f0-4540-aa0d-a49bf78841e6" />
-
 Now, let's make into seperate dataframe just to analyse the text and the sentiment
 ``` python
 text_dataframe = df[['cleaned_text', 'airline_sentiment']]
 text_dataframe.head()
 ```
-<img width="524" height="198" alt="image" src="https://github.com/user-attachments/assets/4824b4ee-3a50-41dc-b844-cfed185a681c" />
 
 Converting the sentiment from categorical into numerical
 ``` python
 text_dataframe['airline_sentiment'].map({'negative': 0, 'neutral': 1, 'positive': 2})
 ```
-
-<img width="445" height="253" alt="image" src="https://github.com/user-attachments/assets/7060cf34-ff56-41a7-8001-bdaca0999db9" />
 
 Now, let's choose our featrures and target
 
@@ -1010,8 +1005,6 @@ X_test = f.transform(X_test)
 print(X_train.shape,X_test.shape)
 ```
 
-<img width="293" height="49" alt="image" src="https://github.com/user-attachments/assets/00e447d7-8354-4d1b-8c53-23026bfebb7a" />
-
 Converting into dense array for inout purpose
 
 ``` python
@@ -1038,8 +1031,6 @@ print(f"Gaussian Naive Bayes Accuracy: {acc_gnb}")
 print(classification_report(y_test, y_pred_gnb))
 ```
 
-<img width="462" height="214" alt="image" src="https://github.com/user-attachments/assets/997aceb6-6d35-4915-beca-2264bd4beb95" />
-
 We notice that Gaussian Naive Bayes algorithm gives us the accuracy of 52%. Now, let's look into mulitnominal naive bayes approach
 
 ``` python
@@ -1056,7 +1047,6 @@ acc_mnb = accuracy_score(y_test, y_pred_mnb)
 print(f"Multinomial Naive Bayes Accuracy: {acc_mnb}")
 print(classification_report(y_test, y_pred_mnb))
 ```
-<img width="445" height="222" alt="image" src="https://github.com/user-attachments/assets/38cfa1a2-47e4-4d32-b357-1b3146befa86" />
 
 Now, let's check into other algorithms liek logistic regression, Linear SVm, Random forest
 
@@ -1082,9 +1072,6 @@ y_pred_rf = rf.predict(X_test_dense)
 print("\nRandom Forest Accuracy:", (y_pred_rf == y_test).mean())
 print(classification_report(y_test, y_pred_rf))
 ```
-
-<img width="482" height="462" alt="image" src="https://github.com/user-attachments/assets/65d6a89c-f45b-49b3-bfaa-31f3a99af16e" />
-<img width="453" height="217" alt="image" src="https://github.com/user-attachments/assets/c7fab7aa-7371-4018-8a26-7fd43970c852" />
 
 Now, let's compare all the machine learning mdoels to compare the perfromance of the model
 
@@ -1137,9 +1124,6 @@ axes[5].remove()
 plt.subplots_adjust(wspace=0.2, hspace=0.2)
 plt.show()
 ```
-
-<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/eb5f4674-2f37-4047-825e-18ac7234eaef" />
-<img width="1773" height="1478" alt="image" src="https://github.com/user-attachments/assets/39e1a8d2-47f8-4f3f-9e83-747f5915f6ed" />
 
 **3). Deep learning Approach**
 
@@ -1207,14 +1191,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-<img width="1490" height="790" alt="image" src="https://github.com/user-attachments/assets/e02c51fa-0536-42c8-8013-f2f4c5dd72e2" />
-
-<img width="1790" height="989" alt="image" src="https://github.com/user-attachments/assets/91dcfd96-69a2-45d3-8e65-59059b657d1f" />
-
-<img width="1014" height="470" alt="image" src="https://github.com/user-attachments/assets/9d70b19f-b90f-497c-a6d4-c5d240d8f0eb" />
-
-<img width="1389" height="590" alt="image" src="https://github.com/user-attachments/assets/d960106a-336b-458b-912b-a277dcbbcba4" />
-
 Now, let's check for the words that was expressed most of the time by the passengers.
 
 ``` python
@@ -1233,9 +1209,6 @@ def show_wordcloud(sentiment_type, title):
 show_wordcloud('positive', 'Words in Positive Tweets')
 show_wordcloud('negative', 'Words in Negative Tweets')
 ```
-<img width="790" height="427" alt="image" src="https://github.com/user-attachments/assets/0c9855f5-a0f3-43fb-ab6d-2b33d5b89355" />
-
-<img width="790" height="427" alt="image" src="https://github.com/user-attachments/assets/95f205dd-d1b2-4e5c-9a10-7847db62fdde" />
 
 Now, let's check for the complaints
 
@@ -1246,7 +1219,6 @@ plt.title('Top Reasons for Negative Sentiment')
 plt.show()
 ```
 
-<img width="1175" height="547" alt="image" src="https://github.com/user-attachments/assets/efc3db05-3ca3-4128-af41-6218f3f61042" />
 
 Tokenizations of words
 
@@ -1303,7 +1275,6 @@ history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
                     validation_data=(X_test, y_test), verbose=2)
 ```
 
-<img width="870" height="218" alt="image" src="https://github.com/user-attachments/assets/adf3edba-bbb6-435c-82f3-720ee1a25f04" />
 
 Now, let's quickly check for the plot of loss vs accuracy
 
@@ -1331,7 +1302,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-<img width="1390" height="490" alt="image" src="https://github.com/user-attachments/assets/e2754029-9ba4-4bf8-bc55-d212dce03d31" />
 
 Predictions of the test set
 
@@ -1357,7 +1327,6 @@ from sklearn.metrics import classification_report
 print(classification_report(y_test, y_pred, target_names=le.classes_))
 ```
 
-<img width="488" height="291" alt="image" src="https://github.com/user-attachments/assets/becb7625-7465-49b9-8566-3152785d1d2c" />
 
 We notice our model performs well about 81% and the reason I haven't fine tuned it as the model performance will decrease and rely on the majority classes and missclassification of sentiments will take place. We can conclude that deep neural network like LSTM perfromed well than other machine learning models.
 
