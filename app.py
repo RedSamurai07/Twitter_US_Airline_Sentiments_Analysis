@@ -6,7 +6,7 @@ from nltk.corpus import stopwords
 
 app = Flask(__name__)
 
-# Load the brain (Model) and the translator (Vectorizer)
+# Load Model and Vectorizer
 model = pickle.load(open('model.pkl', 'rb'))
 vectorizer = pickle.load(open('vectorizer.pkl', 'rb'))
 stop_words = set(stopwords.words('english'))
@@ -17,19 +17,18 @@ def clean_text(text):
     tokens = [word for word in text.split() if word not in stop_words]
     return " ".join(tokens)
 
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({"status": "healthy"}), 200
+
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
     if not data or 'tweet' not in data:
         return jsonify({'error': 'No tweet provided'}), 400
     
-    # 1. Preprocess the incoming tweet
     cleaned = clean_text(data['tweet'])
-    
-    # 2. Vectorize (Must use .transform, NOT .fit_transform)
     vectorized = vectorizer.transform([cleaned]).toarray()
-    
-    # 3. Predict
     prediction = model.predict(vectorized)[0]
     
     return jsonify({
