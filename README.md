@@ -1,2 +1,1755 @@
 # Twitter_US_Airline_Sentiments_Analysis
 
+## Table of contents
+- [Project Overview](#project-overview)
+- [Executive Summary](#executive-summary)
+- [Goal](goal)
+- [Data Structure](data-structure)
+- [Tools](tools)
+- [Analysis](#analysis)
+- [Insights](insights)
+- [Recommendations](recommendations)
+
+### Project Overview
+- This project focuses on analyzing customer feedback from Twitter to understand sentiment towards major airlines. The dataset provides pre-classified sentiments (positive, neutral, negative) and, for negative feedback, specific reasons for dissatisfaction. This analysis aims to provide actionable insights for airlines to enhance customer service and operational efficiency.
+
+### Executive Summary
+- This analysis of Twitter interactions provides critical insights into customer sentiment, common pain points, and behavioral patterns, equipping various airline departments with actionable intelligence to enhance service, optimize operations, and refine strategic initiatives.
+
+**Overall Findings:**
+- The data reveals a prevalent negative sentiment towards airlines, primarily driven by customer service and operational failures. While negative feedback is widespread across locations and timezones, most individual complaints do not gain significant traction through retweets. Significant data gaps exist in location and timezone information, limiting granular analysis.
+
+**1. Customer Service Department:**
+- This analysis provides the customer service team with a clear understanding of the most frequent complaints, including core "Customer Service Issues" and "Miscellaneous" problems (e.g., online cancellation difficulties, food service, long wait times). It identifies peak hours and days (mornings, nights, Sundays) for customer dissatisfaction, enabling optimized staffing and proactive engagement. Regional hotspots for negative sentiment (e.g., Washington D.C., NYC, Chicago) and specific issues within those areas (e.g., flight attendant complaints in Boston, cancelled flights in Austin, TX) allow for targeted training and resource allocation to improve response times and resolution quality.
+
+**2. Operations Department:**
+- For the operations team, the analysis highlights critical operational failures such as "Late Flights" (especially for American, United) and "Cancelled Flights" (Austin, TX). "Booking problems" are specifically identified with United Airways. Understanding these recurring issues, their frequency, and associated locations allows operations to prioritize improvements in scheduling, maintenance, ground services, and online system reliability to reduce disruptions and enhance passenger experience.
+
+**3. Marketing & Communications Team:**
+- The marketing and communications team gains valuable insights into brand perception. The analysis reveals that United, US Airways, and American Airlines face the most negative sentiment, while Virgin America enjoys the highest positive tweet proportion. This information is crucial for developing targeted communication strategies, managing public relations during peak complaint periods, and crafting messages that address common pain points. It also informs the strategic timing of campaigns, avoiding peak negative tweeting times and leveraging quieter periods (Wednesdays, Thursdays) for promotional efforts.
+
+**4. Senior Management & Strategy:**
+- This comprehensive overview allows senior management to grasp the overall state of customer satisfaction and identify systemic issues. The pervasive negative sentiment underscores the need for a holistic, customer-centric approach to strategy. Understanding the high confidence in negative classifications, the dominance of customer service and operational issues, and the impact of data gaps (no location/timezone) can guide investment in technology, staff training, and data infrastructure. It also provides a benchmark for monitoring the effectiveness of strategic initiatives aimed at improving customer experience and brand reputation.
+
+### Goal
+- The objective of this analysis is to leverage tweet data to understand public perception of airlines, identify key drivers of negative sentiment, and help airlines make data-driven decisions to improve customer satisfaction and service quality. This could involve building predictive models for sentiment or root cause analysis for the below mentioned key points.
+
+  - Customer Loyalty & Retention
+  - Demographic & Geographic Analysis
+  - Program Effectiveness & Customer Behavior
+  
+### Data structure and initial checks
+[Dataset](https://docs.google.com/spreadsheets/d/1EmudVOp_6vISH8C27vD4agJJEUKdFzSddlHsfkjXDeg/edit?gid=639920194#gid=639920194)
+
+ - The initial checks of your transactions.csv dataset reveal the following:
+
+| Features | Description | Data types |
+| -------- | -------- | -------- | 
+| tweet_id | A unique numerical identifier for each tweet. | int |
+| airline_sentiment | The categorized sentiment of the tweet towards the airline. | object |
+| airline_sentiment_confidence | A numerical value (between 0 and 1) indicating the confidence level of the assigned airline_sentiment. | float |
+| negativereason | If the airline_sentiment is 'negative', this column specifies the reason for the negative feedback.| object  |
+| negativereason_confidence | A numerical value (between 0 and 1) indicating the confidence level of the assigned negativereason. | float |       
+| airline | The name of the airline mentioned in the tweet | object |
+| airline_sentiment_gold | Gold-standard sentiment, likely used for a small subset of hand-labeled data for validation purposes. This column contains many missing values. | object |
+| name | The Twitter handle (username) of the individual who posted the tweet. | object |
+| negativereason_gold | The full content of the tweet. This is the primary data for sentiment analysis. | object |
+| retweet_count | The number of times the tweet has been retweeted. | int|  
+| text  | The full content of the tweet. This is the primary data for sentiment analysis. | object |
+|  tweet_coord | Geographic coordinates of the tweet, if available. | object |
+| tweet_created | The date and time when the tweet was posted. | object |
+| tweet_location | The user-provided location from which the tweet was sent. | object |
+| user_timezone | The timezone setting of the user who posted the tweet. | object |
+
+### Tools
+- Excel : Google Sheets - Check for data types, Table formatting
+- Python: VS code / Google Colab - Data Preparation and pre-processing, Exploratory Data Analysis, Descriptive Statistics, inferential Statistics, Data manipulation, Data Visualization, Feature Engineering, Hypothesis Testing, Machine learning, Deep learning, Tokenization, Model Training and evaluation, Model development
+  
+### Analysis
+1). Python
+- Importing Libraries
+``` python
+  import numpy as np
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+```
+``` python
+import plotly.express as px
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn import naive_bayes
+from sklearn.naive_bayes import GaussianNB
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
+from sklearn.feature_extraction.text import TfidfVectorizer
+```
+``` python
+import re, nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('stopwords')
+from nltk import word_tokenize, sent_tokenize
+from nltk.corpus import stopwords
+from collections import Counter
+```
+<img width="529" height="318" alt="image" src="https://github.com/user-attachments/assets/ae52ccba-9c53-4cba-a268-cc06182b097e" />
+
+- Loading the dataset
+``` python
+  df = pd.read_csv('Tweets.csv')
+  df.head()
+```
+<img width="1840" height="452" alt="image" src="https://github.com/user-attachments/assets/149f6dcc-cb9e-40f1-9b32-4a363b9db3ec" />
+
+- Dimension and Shape of the dataset
+``` python
+  df.ndim
+```
+<img width="83" height="32" alt="image" src="https://github.com/user-attachments/assets/9eea5018-49fc-4762-9cd7-95b04f50e070" />
+
+``` python
+df.shape
+```
+<img width="176" height="46" alt="image" src="https://github.com/user-attachments/assets/304dd5d1-6d6f-4566-acac-eb3394940ff3" />
+
+- Information of the Dataset
+``` python
+df.info()
+```
+<img width="423" height="394" alt="image" src="https://github.com/user-attachments/assets/41aa8940-6c56-45b2-9c5d-f43ffcdb4253" />
+
+- Data Cleaning and Pre-processing
+``` python
+   df.isna().sum()/len(df)*100
+```
+``` python
+df.drop_duplicates(inplace = True)
+```
+``` python
+  df.drop('airline_sentiment_gold',axis = 1,inplace = True)
+  df.drop('negativereason_gold',axis = 1,inplace = True)
+  df.drop('tweet_coord',axis = 1, inplace = True)
+```
+``` python
+  df['negativereason'] = df['negativereason'].fillna('Others')
+  df['negativereason_confidence'] = df['negativereason_confidence'].fillna(df['negativereason_confidence'].mean())
+``` python
+  df['tweet_location'].fillna('No location',inplace = True)
+  df['user_timezone'].fillna('No Timezone',inplace = True)
+```
+``` python
+  df[['Sub_airline', 'Comments']] = df['text'].str.split(' ', n=1, expand=True)
+  correct_air = df['Sub_airline'] == df['airline']
+  correct_air.value_counts()
+```
+<img width="226" height="50" alt="image" src="https://github.com/user-attachments/assets/5e62a9bb-6b61-47c5-adda-9f9c99325032" />
+
+``` python
+  df.drop('text',axis = 1, inplace = True)
+  df.drop('Sub_airline',axis = 1, inplace = True)
+  df.drop('Comments',axis = 1, inplace = True)
+```
+``` python
+  df.isna().sum()/len(df)*100
+```
+
+Descriptive Statistics
+``` python
+  df.describe()
+```
+<img width="831" height="275" alt="image" src="https://github.com/user-attachments/assets/5faeff86-bfef-4541-bb50-68085b99da2f" />
+
+``` python
+  df.head()
+```
+<img width="1802" height="334" alt="image" src="https://github.com/user-attachments/assets/d4d591c6-c318-4008-8217-d9530c49f895" />
+
+1. **Customer Loyalty & Retention**
+
+``` python
+  pd.crosstab(df['airline'],df['negativereason'])
+```
+
+<img width="1491" height="251" alt="image" src="https://github.com/user-attachments/assets/5e32bd9a-5541-43a4-bbed-6bf32da65c00" />
+
+``` python
+  fig = plt.figure(figsize=(15,8))
+  sns.countplot(x = 'airline',hue = 'negativereason',data = df)
+  plt.title('Count of Negative Reasons by Airline')
+  plt.xlabel('Airline')
+  plt.ylabel('Count')
+  plt.show()
+```
+
+<img width="1246" height="701" alt="image" src="https://github.com/user-attachments/assets/cd2b5bcc-6a5f-4e17-8700-807c4cb9b9de" />
+
+``` python
+  df['negativereason'].value_counts().plot(kind = 'bar',color = sns.color_palette('magma'))
+  plt.title('Reasons for Negative Tweet')
+  plt.xlabel('Negative reason')
+  plt.ylabel('Count')
+  plt.show()
+  print(df['negativereason'].value_counts().reset_index())
+```
+
+<img width="580" height="636" alt="image" src="https://github.com/user-attachments/assets/adb4b651-d183-4331-8908-dd9550d2dd25" />
+<img width="329" height="254" alt="image" src="https://github.com/user-attachments/assets/58c63801-37f7-4026-9bce-bc65a69b1644" />
+
+``` python
+  airline_sentiment_counts = df.groupby(['airline', 'airline_sentiment']).size().unstack(fill_value=0)
+  airline_sentiment_proportions = airline_sentiment_counts.apply(lambda x: x / x.sum()*100, axis=1)
+
+  # Highest proportion of positive sentiment tweets
+  most_positive_airline = airline_sentiment_proportions['positive'].idxmax()
+  print(f"Airline with highest proportion of positive tweets: {most_positive_airline}")
+
+  # Highest proportion of negative sentiment tweets
+  most_negative_airline = airline_sentiment_proportions['negative'].idxmax()
+  print(f"Airline with highest proportion of negative tweets: {most_negative_airline}")
+
+  # Optionally, display the full proportion table
+  print("\nProportion of sentiments per airline:")
+  print(airline_sentiment_proportions.reset_index())
+
+  figure=plt.figure(figsize=(15,8))
+  airline_sentiment_proportions.plot(kind = 'bar',color = sns.color_palette('tab10'))
+  plt.title('Airline Sentiment Proportion')
+  plt.xlabel('Airlines')
+  plt.xticks(rotation = 90)
+  plt.ylabel('Percentage')
+  plt.legend()
+  plt.show()
+```
+
+<img width="562" height="236" alt="image" src="https://github.com/user-attachments/assets/6fb2a5dc-cc64-4cc8-b5f5-6af72e9c7f75" />
+<img width="562" height="543" alt="image" src="https://github.com/user-attachments/assets/76899d55-6544-40f6-8730-f50c175e0596" />
+
+``` python
+  negative_tweets_df = df[df['airline_sentiment'] == 'negative']
+
+  # Plotting the distribution of airline_sentiment_confidence for negative tweets
+  plt.figure(figsize=(10, 6))
+  sns.histplot(negative_tweets_df['airline_sentiment_confidence'], bins=20, kde=True)
+  plt.title('Distribution of Airline Sentiment Confidence for Negative Tweets')
+  plt.xlabel('Airline Sentiment Confidence')
+  plt.ylabel('Count')
+  plt.show()
+
+  # Calculate the correlation between airline_sentiment_confidence and whether a tweet is negative
+  df['is_negative'] = (df['airline_sentiment'] == 'negative').astype(int)
+
+  # Calculating the correlation coefficient
+  correlation = df['airline_sentiment_confidence'].corr(df['is_negative'])
+  print(f"\nCorrelation between airline_sentiment_confidence and likelihood of a tweet being negative: {correlation}")
+
+  # Interpreting the correlation coefficient:
+  if correlation > 0.1:
+     print("There is a weak positive correlation, suggesting higher confidence might be slightly associated with negative tweets.")
+  elif correlation < -0.1:
+     print("There is a weak negative correlation, suggesting higher confidence might be slightly associated with non-negative tweets.")
+  else:
+     print("There is a very weak or no linear correlation.")
+
+  # Also, we can look at the mean confidence for different sentiment categories
+  mean_confidence_by_sentiment = df.groupby('airline_sentiment')['airline_sentiment_confidence'].mean()
+  print("\nMean Airline Sentiment Confidence by Sentiment")
+  print('\t')
+  mean_confidence_by_sentiment.reset_index()
+```
+
+<img width="859" height="547" alt="image" src="https://github.com/user-attachments/assets/90605558-4cfd-42c8-9538-d236900642ba" />
+<img width="969" height="263" alt="image" src="https://github.com/user-attachments/assets/c1070fba-4c8a-4f77-a481-ee9f98e8a9e1" />
+
+2. **Demographic & Geographic Analysis**
+
+``` python
+  location_sentiment = df.groupby(['tweet_location', 'airline_sentiment']).size().unstack(fill_value=0)
+  timezone_sentiment = df.groupby(['user_timezone', 'airline_sentiment']).size().unstack(fill_value=0)
+
+  min_tweets = 50
+  location_sentiment_filtered = location_sentiment[(location_sentiment['negative'] + location_sentiment['neutral'] + location_sentiment['positive']) >= min_tweets]
+  timezone_sentiment_filtered = timezone_sentiment[(timezone_sentiment['negative'] + timezone_sentiment['neutral'] + timezone_sentiment['positive']) >= min_tweets]
+
+  print("\nSentiment distribution by Tweet Location (filtered for locations with >= 50 tweets):")
+  print(location_sentiment_filtered)
+
+  print("\nSentiment distribution by User Timezone (filtered for timezones with >= 50 tweets):")
+  print(timezone_sentiment_filtered)
+```
+
+<img width="685" height="472" alt="image" src="https://github.com/user-attachments/assets/e623effc-125a-4e80-a075-e08063ec72ed" />
+<img width="677" height="325" alt="image" src="https://github.com/user-attachments/assets/c284f53f-2968-49d5-8f28-73f7607ef91d" />
+
+``` python
+  location_sentiment_proportions = location_sentiment_filtered.apply(lambda x: x / x.sum()*100, axis=1)
+  timezone_sentiment_proportions = timezone_sentiment_filtered.apply(lambda x: x / x.sum()*100, axis=1)
+
+  print("\nProportion of Sentiment by Tweet Location (filtered):")
+  print(location_sentiment_proportions.sort_values(by='negative', ascending=False).head(10))
+  print(location_sentiment_proportions.sort_values(by='positive', ascending=False).head(10))
+  print('\n')
+  print("\nProportion of Sentiment by User Timezone (filtered):")
+  print(timezone_sentiment_proportions.sort_values(by='negative', ascending=False).head(10))
+  print(timezone_sentiment_proportions.sort_values(by='positive', ascending=False).head(10))
+```
+
+<img width="436" height="514" alt="image" src="https://github.com/user-attachments/assets/420cb3e6-bd6e-4b6b-8b46-0cb46eb7b05f" />
+<img width="496" height="512" alt="image" src="https://github.com/user-attachments/assets/efa5e470-476d-42b9-bcb6-c97ec66c4923" />
+
+``` python
+  location_negativereason = df.groupby(['tweet_location', 'negativereason']).size().unstack(fill_value=0)
+  timezone_negativereason = df.groupby(['user_timezone', 'negativereason']).size().unstack(fill_value=0)
+
+  min_negative_tweets_for_analysis = 50
+  location_negativereason_filtered = location_negativereason[location_negativereason.sum(axis=1) >= min_negative_tweets_for_analysis]
+  timezone_negativereason_filtered = timezone_negativereason[timezone_negativereason.sum(axis=1) >= min_negative_tweets_for_analysis]
+
+  print("\nDistribution of Negative Reasons by Tweet Location (filtered for locations with >= 50 negative tweets):")
+  print(location_negativereason_filtered.apply(lambda x: x / x.sum(), axis=1).head())
+
+  print("\nDistribution of Negative Reasons by User Timezone (filtered for timezones with >= 50 negative tweets):")
+  print(timezone_negativereason_filtered.apply(lambda x: x / x.sum(), axis=1).head())
+```
+
+<img width="837" height="492" alt="image" src="https://github.com/user-attachments/assets/6161b3dc-fdf8-4a31-922e-2f8b576da614" />
+<img width="831" height="491" alt="image" src="https://github.com/user-attachments/assets/0ca82885-8775-404a-9217-54492b8bfe81" />
+<img width="568" height="463" alt="image" src="https://github.com/user-attachments/assets/0cdc5c63-b131-4007-8e18-97e25e4bebff" />
+
+``` python
+  # To see if they vary significantly, we can look at the top reasons in different locations/timezones
+  print("\nTop negative reasons by location (showing top 5 locations by total negative tweets):")
+  for location in location_negativereason_filtered.sum(axis=1).sort_values(ascending=False).head(5).index:
+  print(f"\nLocation: {location}")
+  print(location_negativereason_filtered.loc[location].sort_values(ascending=False).head(5))
+
+  print("\nTop negative reasons by timezone (showing top 5 timezones by total negative tweets):")
+  for timezone in timezone_negativereason_filtered.sum(axis=1).sort_values(ascending=False).head(5).index:
+     print(f"\nTimezone: {timezone}")
+     print(timezone_negativereason_filtered.loc[timezone].sort_values(ascending=False).head(5))
+```
+
+<img width="693" height="434" alt="image" src="https://github.com/user-attachments/assets/8c7e7637-0355-4c79-bb6c-c77a5f9f44ee" />
+<img width="418" height="523" alt="image" src="https://github.com/user-attachments/assets/5319450b-153e-4ae8-b38f-6cbd93d973c7" />
+<img width="678" height="351" alt="image" src="https://github.com/user-attachments/assets/7c72cb73-4703-48f7-b6f1-b41c7ceb9ff8" />
+<img width="686" height="563" alt="image" src="https://github.com/user-attachments/assets/ed561db2-4f6e-4f2d-a137-ea7c5195de20" />
+<img width="418" height="521" alt="image" src="https://github.com/user-attachments/assets/c2b75602-5a39-43b1-bb3e-b30b36ddd5e4" />
+<img width="690" height="555" alt="image" src="https://github.com/user-attachments/assets/e551b86a-c2ac-484c-bb36-967ca5f82500" />
+<img width="388" height="520" alt="image" src="https://github.com/user-attachments/assets/21517d3f-b242-40c2-9923-7bce68550a46" />
+<img width="679" height="563" alt="image" src="https://github.com/user-attachments/assets/53ec43ee-8cbd-4885-9d4b-0954caf8e201" />
+<img width="412" height="524" alt="image" src="https://github.com/user-attachments/assets/d0b35301-b7b3-4dcd-ab60-7cac959ea276" />
+<img width="687" height="562" alt="image" src="https://github.com/user-attachments/assets/b91171da-29d9-410e-b339-726a986acd1f" />
+<img width="388" height="343" alt="image" src="https://github.com/user-attachments/assets/8914d0de-0546-46ea-85b7-83377ac4208f" />
+
+``` python
+  negative_reason_to_compare = 'Customer Service Issue'
+    if negative_reason_to_compare in location_negativereason_filtered.columns:
+    plt.figure(figsize=(15, 8))
+    location_negativereason_filtered.apply(lambda x: x / x.sum()*100, axis=1)[negative_reason_to_compare].sort_values(ascending=False).head(10).plot(kind='bar',color = 'orange')
+    plt.title(f'Proportion of "{negative_reason_to_compare}" by Location')
+    plt.xlabel('Tweet Location')
+    plt.ylabel('Proportion')
+    plt.xticks(rotation=90)
+    plt.show()
+
+  if negative_reason_to_compare in timezone_negativereason_filtered.columns:
+     plt.figure(figsize=(15, 8))
+     timezone_negativereason_filtered.apply(lambda x: x / x.sum()*100, axis=1)[negative_reason_to_compare].sort_values(ascending=False).head(10).plot(kind='bar',color = 'darkblue')
+     plt.title(f'Proportion of "{negative_reason_to_compare}" by Timezone')
+     plt.xlabel('User Timezone')
+     plt.ylabel('Proportion')
+     plt.xticks(rotation=90)
+     plt.show()
+```
+<img width="1229" height="798" alt="image" src="https://github.com/user-attachments/assets/9e8490c6-41e0-47ca-b0da-d62f49c4a075" />
+<img width="1229" height="885" alt="image" src="https://github.com/user-attachments/assets/07333a26-1f9c-4728-b1ad-876ce97e2cf5" />
+
+``` python
+  airline_location_sentiment = df.groupby(['airline', 'tweet_location', 'airline_sentiment']).size().unstack(fill_value=0)
+  min_tweets_location_airline = 20
+  airline_location_sentiment_filtered = airline_location_sentiment[airline_location_sentiment.sum(axis=1) >= min_tweets_location_airline]
+  airline_location_sentiment_proportions = airline_location_sentiment_filtered.apply(lambda x: x / x.sum() * 100, axis=1)
+
+  # To Analyze sentiment for each airline in specific locations
+  for airline_to_analyze in airline_location_sentiment_proportions.index.get_level_values('airline').unique():
+      print(f"\nAnalyzing sentiment performance for {airline_to_analyze} in specific locations:")
+      airline_data = airline_location_sentiment_proportions.loc[airline_to_analyze]
+
+      # Locations with highest positive sentiment proportion for the airline
+      top_positive_locations = airline_data.sort_values(by='positive', ascending=False).head(10)
+      print(f"\nTop 10 locations for {airline_to_analyze} with highest positive sentiment proportion:")
+      print(top_positive_locations[['positive', 'negative', 'neutral']])
+
+      # Locations with highest negative sentiment proportion for the airline
+      top_negative_locations = airline_data.sort_values(by='negative', ascending=False).head(10)
+      print(f"\nTop 10 locations for {airline_to_analyze} with highest negative sentiment proportion:")
+      print(top_negative_locations[['positive', 'negative', 'neutral']])
+
+      if not top_positive_locations.empty:
+          plt.figure(figsize=(10, 8))
+          top_positive_locations[['positive', 'negative', 'neutral']].plot(kind='bar', stacked=True, ax=plt.gca(), color = sns.color_palette('Spectral'))
+          plt.title(f'Sentiment Distribution for {airline_to_analyze} in Top 10 Locations (by Positive Sentiment)')
+          plt.xlabel('Tweet Location')
+          plt.ylabel('Proportion (%)')
+          plt.xticks(rotation=90)
+          plt.legend(title='Sentiment')
+          plt.tight_layout()
+          plt.show()
+
+      if not top_negative_locations.empty:
+          plt.figure(figsize=(10, 8))
+          top_negative_locations[['positive', 'negative', 'neutral']].plot(kind='bar', stacked=True, ax=plt.gca(), color = sns.color_palette('flare'))
+          plt.title(f'Sentiment Distribution for {airline_to_analyze} in Top 10 Locations (by Negative Sentiment)')
+          plt.xlabel('Tweet Location')
+          plt.ylabel('Proportion (%)')
+          plt.xticks(rotation=90)
+          plt.legend(title='Sentiment')
+          plt.tight_layout()
+          plt.show()
+```
+
+<img width="602" height="591" alt="image" src="https://github.com/user-attachments/assets/d3436971-cf0a-4f15-a2a0-c57296699137" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/94800f4d-3a3a-44f5-bcd5-775f1daa9c7f" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/0c7d7dcc-d723-4f5a-a052-38b4720510e5" />
+
+<img width="580" height="586" alt="image" src="https://github.com/user-attachments/assets/7c656320-7053-4bcd-8748-fa801fea71cf" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/a9328611-d8d7-4f27-a56d-ac4ec509ede3" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/44c264a2-7c7d-434e-ac22-a25f0d463c04" />
+
+<img width="619" height="388" alt="image" src="https://github.com/user-attachments/assets/1e74b103-e45a-49bd-a586-dde13ce99a43" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/6d73adee-fb34-49e2-98bc-80fe9891203e" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/c5f4a4da-7c69-4e38-9061-a73fc85f76a0" />
+
+<img width="629" height="504" alt="image" src="https://github.com/user-attachments/assets/710d2906-80ea-466c-a7d8-994ea1602d57" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/2d068a90-187f-4514-8e1a-b3325d83ede0" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/89f729b0-3822-4f3a-8a30-c5d6de4ee15c" />
+
+<img width="589" height="597" alt="image" src="https://github.com/user-attachments/assets/7202d494-72d9-44a7-aa23-32054b9235d8" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/bc41a769-36e5-4dc0-832f-6b01ef8db0da" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/93734421-1049-406b-83a3-c9d3f3c9f858" />
+
+<img width="655" height="237" alt="image" src="https://github.com/user-attachments/assets/d51dd788-6eaa-43ec-b33b-3432a81d8911" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/adff1c6a-8267-446e-a03a-cb1f4acdeae1" />
+<img width="989" height="790" alt="image" src="https://github.com/user-attachments/assets/cb67637c-6be8-4a61-8dd9-31684cb43cbc" />
+
+``` python
+  # To Analyze sentiment for each airline in specific timezones
+  airline_timezone_sentiment = df.groupby(['airline', 'user_timezone', 'airline_sentiment']).size().unstack(fill_value=0)
+  min_tweets_timezone_airline = 10
+  airline_timezone_sentiment_filtered = airline_timezone_sentiment[airline_timezone_sentiment.sum(axis=1) >= min_tweets_timezone_airline]
+  airline_timezone_sentiment_proportions = airline_timezone_sentiment_filtered.apply(lambda x: x / x.sum() * 100, axis=1)
+
+  for airline_to_analyze in airline_timezone_sentiment_proportions.index.get_level_values('airline').unique():
+      print(f"\nAnalyzing sentiment performance for {airline_to_analyze} in specific timezones:")
+
+      airline_data_tz = airline_timezone_sentiment_proportions.loc[airline_to_analyze]
+
+      # Timezones with highest positive sentiment proportion for the airline
+      top_positive_timezones = airline_data_tz.sort_values(by='positive', ascending=False).head(10)
+      print(f"\nTop 10 timezones for {airline_to_analyze} with highest positive sentiment proportion:")
+      print(top_positive_timezones[['positive', 'negative', 'neutral']])
+
+      # Timezones with highest negative sentiment proportion for the airline
+      top_negative_timezones = airline_data_tz.sort_values(by='negative', ascending=False).head(10)
+      print(f"\nTop 10 timezones for {airline_to_analyze} with highest negative sentiment proportion:")
+      print(top_negative_timezones[['positive', 'negative', 'neutral']])
+
+      if not top_positive_timezones.empty:
+          plt.figure(figsize=(15, 8))
+          top_positive_timezones[['positive', 'negative', 'neutral']].plot(kind='bar', stacked=True, ax=plt.gca(), color = sns.color_palette('viridis'))
+          plt.title(f'Sentiment Distribution for {airline_to_analyze} in Top 10 Timezones (by Positive Sentiment)')
+          plt.xlabel('User Timezone')
+          plt.ylabel('Proportion (%)')
+          plt.xticks(rotation=90)
+          plt.legend(title='Sentiment')
+          plt.tight_layout()
+          plt.show()
+
+      if not top_negative_timezones.empty:
+          plt.figure(figsize=(15, 8))
+          top_negative_timezones[['positive', 'negative', 'neutral']].plot(kind='bar', stacked=True, ax=plt.gca(), color = sns.color_palette('plasma'))
+          plt.title(f'Sentiment Distribution for {airline_to_analyze} in Top 10 Timezones (by Negative Sentiment)')
+          plt.xlabel('User Timezone')
+          plt.ylabel('Proportion (%)')
+          plt.xticks(rotation=90)
+          plt.legend(title='Sentiment')
+          plt.tight_layout()
+          plt.show()
+```
+
+![image](https://github.com/user-attachments/assets/d362c39e-7de8-4e58-ac97-0c39958a6cfc)
+![image](https://github.com/user-attachments/assets/dfffa998-fe50-4a60-a7b4-15d9f5de0ace)
+![image](https://github.com/user-attachments/assets/a6ce748e-fa85-4d8b-8850-644ff0cae14b)
+
+
+![image](https://github.com/user-attachments/assets/29cfa98f-bc4f-4964-8bf9-916d7c73a0f3)
+![image](https://github.com/user-attachments/assets/65488fb7-a2ee-47d4-8fc5-64c3fd45a5ea)
+![image](https://github.com/user-attachments/assets/d71dd0c8-7492-4bdb-b495-7c910b3d7e80)
+
+![image](https://github.com/user-attachments/assets/e102116f-b8d7-4e89-a20a-5b2840d1e52c)
+![image](https://github.com/user-attachments/assets/80243571-9056-4657-bebf-60f7ebd541b4)
+![image](https://github.com/user-attachments/assets/48c767bd-43e9-4356-b38c-854e00612a32)
+
+![image](https://github.com/user-attachments/assets/6f1d305a-1a3a-4613-bfe0-565703ce2711)
+![image](https://github.com/user-attachments/assets/9ec159a2-2262-461a-906f-b0ad4511bf2a)
+![image](https://github.com/user-attachments/assets/ab4c4a37-4865-405d-a10b-684ac387ca22)
+
+![image](https://github.com/user-attachments/assets/53125458-f991-4e41-8383-5a010eaec219)
+![image](https://github.com/user-attachments/assets/7f94400e-bbaf-4e88-a45a-b5aeda9b0b60)
+![image](https://github.com/user-attachments/assets/b21a2f5a-a2e1-48c3-b1cd-8e370102ef4f)
+
+![image](https://github.com/user-attachments/assets/a2266060-c4a0-46dc-97df-928629847c23)
+![image](https://github.com/user-attachments/assets/1eab1284-88ac-442f-87b6-9cd9d50d2fad)
+![image](https://github.com/user-attachments/assets/02a7a73d-9bc1-419a-b04c-a94f411a1cb1)
+
+``` python
+  timezone_tweet_volume = df['user_timezone'].value_counts().reset_index()
+  timezone_tweet_volume.columns = ['user_timezone', 'tweet_volume']
+
+  # Filter out 'No Timezone' if you don't want to include it in the visualization
+  timezone_tweet_volume_filtered = timezone_tweet_volume[timezone_tweet_volume['user_timezone'] != 'No Timezone']
+
+  top_n_timezones_volume = 20
+  plt.figure(figsize=(15, 8))
+  sns.barplot(x='user_timezone', y='tweet_volume', data=timezone_tweet_volume_filtered.head(top_n_timezones_volume), palette='viridis')
+  plt.title(f'Tweet Volume by User Timezone (Top {top_n_timezones_volume})')
+  plt.xlabel('User Timezone')
+  plt.ylabel('Number of Tweets')
+  plt.xticks(rotation=90)
+  plt.tight_layout()
+  plt.show()
+
+  timezone_sentiment_counts = df.groupby(['user_timezone', 'airline_sentiment']).size().unstack(fill_value=0)
+  min_tweets_for_sentiment_proportion = 100 # Adjust the threshold how much ever you need
+  timezone_sentiment_filtered_for_proportion = timezone_sentiment_counts[timezone_sentiment_counts.sum(axis=1) >= min_tweets_for_sentiment_proportion]
+  timezone_sentiment_proportions = timezone_sentiment_filtered_for_proportion.apply(lambda x: x / x.sum() * 100, axis=1)
+
+  top_n_timezones_sentiment = 15 # display of sentiment for top timezones by volume or based on filtered list size
+
+  plt.figure(figsize=(15, 8))
+  timezone_sentiment_proportions.head(top_n_timezones_sentiment)[['positive', 'neutral', 'negative']].plot(kind='bar', stacked=True, ax=plt.gca(), color=sns.color_palette('RdYlGn'))
+  plt.title(f'Sentiment Distribution by User Timezone (Top {top_n_timezones_sentiment} Timezones by Tweet Volume)')
+  plt.xlabel('User Timezone')
+  plt.ylabel('Proportion (%)')
+  plt.xticks(rotation=90)
+  plt.legend(title='Sentiment')
+  plt.tight_layout()
+  plt.show()
+
+  print("\nSentiment Proportion by User Timezone (filtered for timezones with >= {} tweets):".format(min_tweets_for_sentiment_proportion))
+  print(timezone_sentiment_proportions.sort_values(by='negative', ascending=False).head()) # Timezones with highest negative proportion
+  print(timezone_sentiment_proportions.sort_values(by='positive', ascending=False).head()) # Timezones with highest positive proportion
+```
+
+<img width="1490" height="790" alt="image" src="https://github.com/user-attachments/assets/b1b0d2a3-4305-4ae6-b208-d1fcad924e90" />
+<img width="1489" height="790" alt="image" src="https://github.com/user-attachments/assets/7eeeefce-382d-423d-8686-42d1e5fd7afb" />
+<img width="679" height="311" alt="image" src="https://github.com/user-attachments/assets/c2894b66-c21f-4710-aaa3-5289d1c9f871" />
+
+3. **Program Effectiveness & Customer Behavior**
+
+``` python
+  tweet_retweet_sentiment = df.groupby('airline_sentiment')['retweet_count'].mean().reset_index()
+  print("\nAverage Retweet Count by Sentiment:")
+  print(tweet_retweet_sentiment)
+
+  plt.figure(figsize=(8, 6))
+  sns.barplot(x='airline_sentiment', y='retweet_count', data=tweet_retweet_sentiment, palette='viridis')
+  plt.title('Average Retweet Count by Sentiment')
+  plt.xlabel('Sentiment')
+  plt.ylabel('Average Retweet Count')
+  plt.show()
+```
+
+<img width="349" height="123" alt="image" src="https://github.com/user-attachments/assets/2ff42476-241e-42c7-ab9c-41bd143b9d13" />
+<img width="700" height="547" alt="image" src="https://github.com/user-attachments/assets/d74461a9-b74e-49fc-b592-ce0a13f5e9b0" />
+
+``` python
+  sentiment_counts = df['airline_sentiment'].value_counts()
+  plt.figure(figsize=(8, 8))
+  plt.pie(sentiment_counts, labels=sentiment_counts.index, autopct='%1.1f%%', startangle=90, colors=['#FFCC17', '#F0561D', '#0066CC'])
+  plt.title('Distribution of Airline Sentiment')
+  plt.axis('equal') # Equal aspect ratio ensures that pie is drawn as a circle.
+  plt.show()
+```
+
+<img width="724" height="658" alt="image" src="https://github.com/user-attachments/assets/0b4ed707-ba5c-4f16-91f9-3b154d7fdfff" />
+
+``` python
+  df['tweet_created'] = pd.to_datetime(df['tweet_created'])
+  negative_tweets_time = df[df['airline_sentiment'] == 'negative'].copy()
+
+  # Analyze negative tweets by day of the week
+  negative_tweets_time['day_of_week'] = negative_tweets_time['tweet_created'].dt.day_name()
+  negative_tweets_by_day = negative_tweets_time['day_of_week'].value_counts().reindex(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
+
+  print("\nNegative tweets count by day of the week:")
+  print(negative_tweets_by_day)
+
+  plt.figure(figsize=(10, 6))
+  sns.barplot(x=negative_tweets_by_day.index, y=negative_tweets_by_day.values, palette='viridis')
+  plt.title('Negative Tweet Volume by Day of the Week')
+  plt.xlabel('Day of the Week')
+  plt.ylabel('Number of Negative Tweets')
+  plt.show()
+
+  # Analyze negative tweets by hour of the day (using the hour in UTC as the original data seems to be UTC)
+  negative_tweets_time['hour_of_day'] = negative_tweets_time['tweet_created'].dt.hour
+
+  negative_tweets_by_hour = negative_tweets_time['hour_of_day'].value_counts().sort_index()
+
+  print("\nNegative tweets count by hour of the day:")
+  print(negative_tweets_by_hour)
+  plt.figure(figsize=(12, 6))
+  sns.lineplot(x=negative_tweets_by_hour.index, y=negative_tweets_by_hour.values)
+  plt.title('Negative Tweet Volume by Hour of the Day (UTC)')
+  plt.xlabel('Hour of the Day (UTC)')
+  plt.ylabel('Number of Negative Tweets')
+  plt.xticks(range(0, 24))
+  plt.grid(True)
+  plt.show()
+
+  # To see if the _proportion_ of negative tweets changes by time, calculating total tweets by time period as well
+  all_tweets_time = df.copy()
+
+  all_tweets_time['day_of_week'] = all_tweets_time['tweet_created'].dt.day_name()
+
+  all_tweets_by_day = all_tweets_time['day_of_week'].value_counts().reindex(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
+
+  all_tweets_time['hour_of_day'] = all_tweets_time['tweet_created'].dt.hour
+
+  all_tweets_by_hour = all_tweets_time['hour_of_day'].value_counts().sort_index()
+
+  negative_proportion_by_day = (negative_tweets_by_day / all_tweets_by_day).dropna()
+  print("\nProportion of negative tweets by day of the week:")
+  print(negative_proportion_by_day)
+  plt.figure(figsize=(12, 6))
+  sns.barplot(x=negative_proportion_by_day.index, y=negative_proportion_by_day.values, palette='plasma')
+  plt.title('Proportion of Negative Tweets by Day of the Week')
+  plt.xlabel('Day of the Week')
+  plt.ylabel('Proportion of Negative Tweets')
+  plt.show()
+
+  negative_proportion_by_hour = (negative_tweets_by_hour / all_tweets_by_hour).dropna()
+  print("\nProportion of negative tweets by hour of the day:")
+  print(negative_proportion_by_hour)
+
+  plt.figure(figsize=(12, 6))
+  sns.lineplot(x=negative_proportion_by_hour.index, y=negative_proportion_by_hour.values)
+  plt.title('Proportion of Negative Tweets by Hour of the Day (UTC)')
+  plt.xlabel('Hour of the Day (UTC)')
+  plt.ylabel('Proportion of Negative Tweets')
+  plt.xticks(range(0, 24))
+  plt.grid(True)
+  plt.show()
+```
+
+<img width="337" height="202" alt="image" src="https://github.com/user-attachments/assets/d9cea4e3-932e-46f2-99c5-a9bcc382ea58" />
+<img width="859" height="547" alt="image" src="https://github.com/user-attachments/assets/dad83f43-676f-48e5-a460-037f661d6529" />
+
+<img width="348" height="538" alt="image" src="https://github.com/user-attachments/assets/11bd96ad-9399-4e06-b494-e2ac35d4df08" />
+<img width="1005" height="547" alt="image" src="https://github.com/user-attachments/assets/3bc37363-12f3-421a-9319-d66c0fda6446" />
+
+<img width="411" height="200" alt="image" src="https://github.com/user-attachments/assets/d11133c7-33ce-4fca-a5f2-c41f7aa308ca" />
+<img width="1001" height="547" alt="image" src="https://github.com/user-attachments/assets/b53d3a4c-f9a8-4454-b0e0-72058b871d48" />
+
+<img width="426" height="538" alt="image" src="https://github.com/user-attachments/assets/e8fb8b53-ea3b-46eb-b3cc-0dc1d2cec9f2" />
+<img width="1018" height="547" alt="image" src="https://github.com/user-attachments/assets/4c1479b9-aa99-4cd0-983a-d17caf9fd541" />
+
+### Hypothesis testing:
+
+1). Customer Loyalty & Retention
+
+- What are the most frequently cited negativereasons across all airlines?
+
+``` python
+  # Null Hypothesis (H0): The frequency of negativereasons is uniformly distributed across all possible negative reasons.
+  # Alternative Hypothesis (H1): The frequency of negativereasons is not uniformly distributed, with certain reasons being cited significantly more often than others.
+
+  from scipy.stats import chi2_contingency
+  from scipy.stats import chisquare
+
+  # Chi-Squared Test for Uniform Distribution of Negative Reasons
+  observed_frequencies = df['negativereason'].value_counts()
+  observed_table = pd.DataFrame({'observed': observed_frequencies}).T
+  total_negative_reasons = observed_frequencies.sum()
+  num_unique_reasons = len(observed_frequencies)
+
+  expected_frequency_per_reason = total_negative_reasons / num_unique_reasons
+  expected_frequencies = np.full(num_unique_reasons, expected_frequency_per_reason)
+
+  chi2_stat, p_value = chisquare(f_obs=observed_frequencies, f_exp=expected_frequencies)
+
+
+  print("\nChi-Squared Test for Uniform Distribution of Negative Reasons")
+  print(f"Observed Frequencies:\n{observed_frequencies}")
+  print(f"Expected Frequency (under H0): {expected_frequency_per_reason:.2f} for each reason")
+  print('\n')
+  print(f"Chi-squared statistic: {chi2_stat:.4f}")
+  print(f"P-value: {p_value:.4f}")
+
+  alpha = 0.05
+   if p_value < alpha:
+      print(f"\nConclusion: With a p-value of {p_value:.4f} (less than alpha={alpha}), we reject the null hypothesis.")
+      print("There is sufficient evidence to suggest that the frequency of negative reasons is not uniformly distributed.")
+   else:
+      print(f"\nConclusion: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis.")
+      print("There is not enough evidence to suggest that the frequency of negative reasons is not uniformly distributed. The observed distribution is consistent with a uniform distribution.")
+```
+
+<img width="900" height="480" alt="image" src="https://github.com/user-attachments/assets/72f9a7b2-2b39-44a4-86ad-e750e18d9280" />
+
+- Which airlines receive the highest proportion of negative sentiment tweets, and which receive the most positive?
+
+``` python
+  # Null Hypothesis (H0): There is no significant difference in the proportion of negative (or positive) sentiment tweets across different airlines.
+  # Alternative Hypothesis (H1): There is a significant difference in the proportion of negative (or positive) sentiment tweets among different airlines.
+
+  contingency_table = pd.crosstab(df['airline'], df['airline_sentiment'])
+  print("\nContingency Table (Airline vs. Sentiment):")
+  print(contingency_table)
+  chi2_stat, p_value, dof, expected = chi2_contingency(contingency_table)
+
+  print("\nChi-Squared Test for Independence (Airline vs. Sentiment)")
+  print(f"Chi-squared statistic: {chi2_stat:.4f}")
+  print(f"P-value: {p_value:.4f}")
+  print(f"Degrees of Freedom: {dof}")
+
+  alpha = 0.05  
+  if p_value < alpha:
+     print(f"\nConclusion: With a p-value of {p_value:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+     print("There is sufficient evidence to suggest that there is a significant difference in the proportion of sentiment tweets across different airlines.")
+  else:
+     print(f"\nConclusion: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+     print("There is not enough evidence to suggest a significant difference in the proportion of sentiment tweets across different airlines. The observed distribution is consistent with independence between    airline and sentiment.")
+```
+
+<img width="1172" height="374" alt="image" src="https://github.com/user-attachments/assets/edd0241a-12df-44ff-9193-4281b5ab4665" />
+
+- Is there a correlation between the airline_sentiment_confidence and the likelihood of a tweet being negative?
+
+``` python
+  # Null Hypothesis (H0): There is no statistical correlation between airline_sentiment_confidence and the likelihood of a tweet being negative.
+  # Alternative Hypothesis (H1): There is a statistical correlation between airline_sentiment_confidence and the likelihood of a tweet being negative.
+  from scipy.stats import pearsonr
+  correlation, p_value_correlation = pearsonr(df['airline_sentiment_confidence'], df['is_negative'])
+
+  print("\nFormal Test for Correlation between Airline Sentiment Confidence and Likelihood of being Negative")
+  print(f"Pearson correlation coefficient: {correlation:.4f}")
+  print(f"P-value for the correlation test: {p_value_correlation:.4f}")
+
+  alpha = 0.05
+  if p_value_correlation < alpha:
+     print(f"\nConclusion: With a p-value of {p_value_correlation:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+     print("There is sufficient evidence to suggest a statistically significant correlation between airline_sentiment_confidence and the likelihood of a tweet being negative.")
+  else:
+    print(f"\nConclusion: With a p-value of {p_value_correlation:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+    print("There is not enough evidence to suggest a statistically significant correlation between airline_sentiment_confidence and the likelihood of a tweet being negative.")
+
+  if abs(correlation) >= 0.5:
+      strength = "strong"
+  elif abs(correlation) >= 0.3:
+      strength = "moderate"
+  elif abs(correlation) >= 0.1:
+      strength = "weak"
+  else:
+     strength = "very weak or no"
+
+  direction = "positive" if correlation > 0 else "negative" if correlation < 0 else "no"
+  print(f"The correlation coefficient ({correlation:.4f}) indicates a {strength} {direction} linear relationship.")
+```
+
+<img width="1354" height="174" alt="image" src="https://github.com/user-attachments/assets/acca7a8f-d14e-4a22-9421-49bb08365551" />
+
+2. Demographic & Geographic Analysis
+
+- Are there specific tweet_locations or user_timezones that show a higher concentration of negative or positive sentiment tweets for particular airlines?
+
+``` python
+  # Null Hypothesis (H0): The distribution of sentiment (negative/positive) for a given airline is independent of tweet_location and user_timezone.
+  # Alternative Hypothesis (H1): The distribution of sentiment (negative/positive) for a given airline is dependent on tweet_location or user_timezone, indicating a higher concentration of specific sentiments in   certain areas/timezones.
+
+  min_combined_tweets = 100
+  for airline_name in df['airline'].unique():
+  print(f"\nTesting for {airline_name}")
+  airline_df = df[df['airline'] == airline_name].copy()
+  airline_df['location_timezone'] = airline_df['tweet_location'] + ' | ' + airline_df['user_timezone']
+  contingency_table_combined = pd.crosstab(airline_df['location_timezone'], airline_df['airline_sentiment'])
+  contingency_table_filtered = contingency_table_combined[contingency_table_combined.sum(axis=1) >= min_combined_tweets]
+
+  if not contingency_table_filtered.empty and contingency_table_filtered.shape[0] > 1 and contingency_table_filtered.shape[1] > 1:
+
+    print(f"\nPerforming Chi-Squared test for {airline_name} (filtered for location-timezone combinations with >= {min_combined_tweets} tweets)")
+    chi2_stat, p_value, dof, expected = chi2_contingency(contingency_table_filtered)
+
+    print(f"Chi-squared statistic: {chi2_stat:.4f}")
+    print(f"P-value: {p_value:.4f}")
+    print(f"Degrees of Freedom: {dof}")
+
+    alpha = 0.05
+    if p_value < alpha:
+      print(f"\nConclusion for {airline_name}: With a p-value of {p_value:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+      print(f"There is sufficient evidence to suggest that the distribution of sentiment for {airline_name} is dependent on tweet_location or user_timezone.")
+  else:
+      print(f"\nConclusion for {airline_name}: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+      print(f"There is not enough evidence to suggest that the distribution of sentiment for {airline_name} is dependent on tweet_location or user_timezone. The observed distribution is consistent with independence.")
+    else:
+       print(f"\nNot enough data for {airline_name} to perform a reliable Chi-Squared test on the combined location/timezone and sentiment relationship with the applied filter.")
+       print(f"Filtered table shape: {contingency_table_filtered.shape}")
+```
+
+![image](https://github.com/user-attachments/assets/05bb6a6f-ec5d-4b88-87f8-030a8ed8d114)
+
+- Do the common negativereasons vary significantly by geographic region or user timezone?
+
+``` python
+  # Null Hypothesis (H0): The distribution of sentiment (negative/positive) for a given airline is independent of tweet_location and user_timezone.
+  # Alternative Hypothesis (H1): The distribution of sentiment (negative/positive) for a given airline is dependent on tweet_location or user_timezone, indicating a higher concentration of specific sentiments in   certain areas/timezones.
+
+  negative_df = df[df['airline_sentiment'] == 'negative'].copy()
+  min_timezone_negative_tweets = 50
+  min_negativereason_count = 20
+
+  timezone_reason_contingency = pd.crosstab(negative_df['user_timezone'], negative_df['negativereason'])
+  timezone_reason_contingency_filtered_tz = timezone_reason_contingency[timezone_reason_contingency.sum(axis=1) >= min_timezone_negative_tweets]
+
+  timezone_reason_contingency_filtered = timezone_reason_contingency_filtered_tz.loc[:, timezone_reason_contingency_filtered_tz.sum(axis=0) >= min_negativereason_count]
+
+  print("\nContingency Table (User Timezone vs. Negative Reason - filtered):")
+  print(timezone_reason_contingency_filtered.head()) # Print head as the table can be large
+
+  if not timezone_reason_contingency_filtered.empty and timezone_reason_contingency_filtered.shape[0] > 1 and timezone_reason_contingency_filtered.shape[1] > 1:
+    print("\nPerforming Chi-Squared Test for Independence (User Timezone vs. Negative Reason)")
+    chi2_stat, p_value, dof, expected = chi2_contingency(timezone_reason_contingency_filtered)
+
+    print(f"Chi-squared statistic: {chi2_stat:.4f}")
+    print(f"P-value: {p_value:.4f}")
+    print(f"Degrees of Freedom: {dof}")
+
+    alpha = 0.05
+    if p_value < alpha:
+       print(f"\nConclusion: With a p-value of {p_value:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+       print("There is sufficient evidence to suggest that the distribution of common negative reasons varies significantly by user_timezone.")
+    else:
+       print(f"\nConclusion: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+       print("There is not enough evidence to suggest that the distribution of common negative reasons varies significantly by user_timezone. The observed distribution is consistent with independence.")
+  else:
+     print("\nNot enough data in the filtered contingency table (User Timezone vs. Negative Reason) to perform a reliable Chi-Squared test.")
+     print(f"Filtered table shape: {timezone_reason_contingency_filtered.shape}")
+```
+
+<img width="601" height="488" alt="image" src="https://github.com/user-attachments/assets/c051c2e5-0a42-49a2-b465-8c4061c7cd20" />
+<img width="1028" height="463" alt="image" src="https://github.com/user-attachments/assets/8fc46ccf-764a-45fa-9ce6-966bcac1c84b" />
+
+- Which airlines demonstrate stronger or weaker sentiment performance in specific geographic areas?
+
+``` python
+  min_location_tweets = 50
+  print("\nTesting Sentiment Performance across Geographic Areas (Tweet Location) for each Airline")
+
+  for airline_name in df['airline'].unique():
+    print(f"\nAnalyzing Sentiment Performance for {airline_name} across Tweet Locations:")
+    airline_df = df[df['airline'] == airline_name].copy()
+    location_sentiment_contingency = pd.crosstab(airline_df['tweet_location'], airline_df['airline_sentiment'])
+    location_sentiment_contingency_filtered = location_sentiment_contingency[location_sentiment_contingency.sum(axis=1) >= min_location_tweets]
+    if not location_sentiment_contingency_filtered.empty and location_sentiment_contingency_filtered.shape[0] > 1 and location_sentiment_contingency_filtered.shape[1] > 1:
+
+    print(f"Performing Chi-Squared test for {airline_name} (filtered for locations with >= {min_location_tweets} tweets)")
+    chi2_stat, p_value, dof, expected = chi2_contingency(location_sentiment_contingency_filtered)
+
+    print(f"Chi-squared statistic: {chi2_stat:.4f}")
+    print(f"P-value: {p_value:.4f}")
+    print(f"Degrees of Freedom: {dof}")
+
+    alpha = 0.05
+    if p_value < alpha:
+      print(f"\nConclusion for {airline_name}: With a p-value of {p_value:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+      print(f"There is sufficient evidence to suggest that the sentiment performance for {airline_name} varies significantly across different tweet_locations.")
+    else:
+      print(f"\nConclusion for {airline_name}: With a p-value of {p_value:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+      print(f"There is not enough evidence to suggest a significant variation in sentiment performance for {airline_name} across different tweet_locations. The observed distribution is consistent with sentiment        performance being independent of location.")
+  else:
+    print(f"Not enough data for {airline_name} in the filtered contingency table (Tweet Location vs. Sentiment) to perform a reliable Chi-Squared test.")
+    print(f"Filtered table shape: {location_sentiment_contingency_filtered.shape}")
+```
+
+<img width="1169" height="507" alt="image" src="https://github.com/user-attachments/assets/63427ca2-19fb-4026-9d2e-503c8dfa4f7c" />
+<img width="1141" height="512" alt="image" src="https://github.com/user-attachments/assets/754165a2-e625-4e90-aa52-45d53a9e530e" />
+
+- How does the volume of tweets and the sentiment distribution differ across various user_timezones?
+
+``` python
+  min_tweets_for_chi2 = 100
+  timezone_sentiment_contingency = pd.crosstab(df['user_timezone'], df['airline_sentiment'])
+  timezone_sentiment_contingency_filtered = timezone_sentiment_contingency[timezone_sentiment_contingency.sum(axis=1) >= min_tweets_for_chi2]
+  print("\nContingency Table (User Timezone vs. Sentiment - filtered for timezones with >= {} tweets):".format(min_tweets_for_chi2))
+  print(timezone_sentiment_contingency_filtered.head())
+
+  # Performing the Chi-Squared Test for Independence
+  if not timezone_sentiment_contingency_filtered.empty and timezone_sentiment_contingency_filtered.shape[0] > 1 and timezone_sentiment_contingency_filtered.shape[1] > 1:
+    chi2_stat_sentiment, p_value_sentiment, dof_sentiment, expected_sentiment = chi2_contingency(timezone_sentiment_contingency_filtered)
+
+    print("\nChi-Squared Test for Independence (User Timezone vs. Sentiment Distribution)")
+    print(f"Chi-squared statistic: {chi2_stat_sentiment:.4f}")
+    print(f"P-value: {p_value_sentiment:.4f}")
+    print(f"Degrees of Freedom: {dof_sentiment}")
+
+    alpha = 0.05
+    if p_value_sentiment < alpha:
+      print(f"\nConclusion: With a p-value of {p_value_sentiment:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+      print("There is sufficient evidence to suggest that the sentiment distribution differs significantly across user timezones.")
+    else:
+      print(f"\nConclusion: With a p-value of {p_value_sentiment:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+      print("There is not enough evidence to suggest a significant difference in sentiment distribution across user timezones. The observed distribution is consistent with sentiment distribution being   independent of timezone.")
+  else:
+    print("\nNot enough data in the filtered contingency table (User Timezone vs. Sentiment) to perform a reliable Chi-Squared test.")
+    print(f"Filtered table shape: {timezone_sentiment_contingency_filtered.shape}")
+
+  # Test 2: Chi-Squared Test for Uniform Distribution of Tweet Volume across Timezones (considering only significant timezones)
+  timezone_tweet_volume_filtered = timezone_sentiment_contingency_filtered.sum(axis=1)
+
+  if not timezone_tweet_volume_filtered.empty and len(timezone_tweet_volume_filtered) > 1:
+    observed_tweet_volumes = timezone_tweet_volume_filtered.values
+    total_volume_filtered = observed_tweet_volumes.sum()
+    num_timezones_filtered = len(observed_tweet_volumes)
+    expected_volume_per_timezone = total_volume_filtered / num_timezones_filtered
+    expected_tweet_volumes = np.full(num_timezones_filtered, expected_volume_per_timezone)
+
+    # Perform the Chi-Squared Test for Uniformity
+    chi2_stat_volume, p_value_volume = chisquare(f_obs=observed_tweet_volumes, f_exp=expected_tweet_volumes)
+
+    print("\nChi-Squared Test for Uniform Distribution of Tweet Volume across Filtered User Timezones")
+    print(f"Observed Tweet Volumes:\n{timezone_tweet_volume_filtered.head()}") # Print head as this can be long
+    print(f"Expected Tweet Volume (under H0): {expected_volume_per_timezone:.2f} for each timezone")
+    print('\n')
+    print(f"Chi-squared statistic: {chi2_stat_volume:.4f}")
+    print(f"P-value: {p_value_volume:.4f}")
+    alpha = 0.05
+    if p_value_volume < alpha:
+      print(f"\nConclusion: With a p-value of {p_value_volume:.4f} (less than alpha={alpha}), we reject the null hypothesis.")
+      print("There is sufficient evidence to suggest that the tweet volume is not uniformly distributed across the filtered user timezones.")
+    else:
+      print(f"\nConclusion: With a p-value of {p_value_volume:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis.")
+      print("There is not enough evidence to suggest that the tweet volume is not uniformly distributed across the filtered user timezones. The observed distribution is consistent with a uniform distribution.")
+
+  else:
+      print("\nNot enough data in the filtered list of timezones to perform a reliable Chi-Squared test for uniform volume.")
+      print(f"Number of filtered timezones: {len(timezone_tweet_volume_filtered)}")
+
+  print("\nOverall Hypothesis Test Conclusion (Timezone vs. Tweet Volume and Sentiment)")
+  alpha = 0.05
+  if p_value_sentiment < alpha or p_value_volume < alpha:
+      print("Based on the Chi-Squared tests for sentiment distribution and tweet volume, we reject the Null Hypothesis (H0).")
+      print("There is significant evidence to suggest that the volume of tweets and/or the sentiment distribution differ across user_timezones.")
+  else:
+      print("Based on the Chi-Squared tests, we fail to reject the Null Hypothesis (H0).")
+      print("There is not enough evidence to suggest that the volume of tweets or the sentiment distribution differ significantly across user_timezones.")
+```
+
+<img width="942" height="335" alt="image" src="https://github.com/user-attachments/assets/340a6b42-99c7-4525-9016-35fe3a68cb86" />
+<img width="1051" height="476" alt="image" src="https://github.com/user-attachments/assets/82822aee-5afa-44f7-94e6-e6a1cd2f8209" />
+
+3. Program Effectiveness & Customer Behavior
+
+How does the retweet_count differ for tweets with positive, neutral, and negative sentiments?
+
+``` python
+  # Null Hypothesis (H0): There is no significant difference in the mean retweet_count among tweets with positive, neutral, and negative sentiments.
+  # Alternative Hypothesis (H1): There is a significant difference in the mean retweet_count among tweets with positive, neutral, and negative sentiments.
+  from scipy.stats import pearsonr
+  import statsmodels.api as sm
+  from statsmodels.formula.api import ols
+  from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
+  model = ols('retweet_count ~ C(airline_sentiment)', data=df).fit()
+  anova_table = sm.stats.anova_lm(model, typ=2) # typ=2 for unbalanced data
+  print("\nANOVA Test for Retweet Count by Sentiment:")
+  print(anova_table)
+
+  alpha = 0.05
+  p_value_anova = anova_table['PR(>F)'][0]
+  if p_value_anova < alpha:
+    print(f"\nConclusion: With a p-value of {p_value_anova:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+    print("There is sufficient evidence to suggest that there is a significant difference in the mean retweet_count among tweets with positive, neutral, and negative sentiments.")
+
+    # Perform Tukey's HSD post-hoc test to see which pairs of sentiments differ
+    print("\nPerforming Tukey's HSD Post-Hoc Test:")
+    tukey_result = pairwise_tukeyhsd(endog=df['retweet_count'], groups=df['airline_sentiment'], alpha=alpha)
+    print(tukey_result)
+    print("\nInterpretation of Tukey's HSD:")
+    print("The 'reject' column indicates if the difference between the means of the two groups (group1 vs group2) is statistically significant (True means significant difference).")
+  else:
+    print(f"\nConclusion: With a p-value of {p_value_anova:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+    print("There is not enough evidence to suggest a significant difference in the mean retweet_count among tweets with positive, neutral, and negative sentiments.")
+    correlation_hour_retweet, p_value_hour_retweet = pearsonr(df['tweet_created'].dt.hour, df['retweet_count'])
+
+    print("\nPearson Correlation between Hour of Day (UTC) and Retweet Count")
+    print(f"Correlation coefficient: {correlation_hour_retweet:.4f}")
+    print(f"P-value: {p_value_hour_retweet:.4f}")
+
+  alpha = 0.05
+  if p_value_hour_retweet < alpha:
+      print("Conclusion: Significant linear correlation between hour of day and retweet count.")
+  else:
+      print("Conclusion: No significant linear correlation between hour of day and retweet count.")
+
+  # For day of the week and retweet count (ANOVA)
+  if not df.empty:
+      df['day_of_week_num'] = df['tweet_created'].dt.dayofweek # Monday=0, Sunday=6
+      day_anova_model = ols('retweet_count ~ C(day_of_week_num)', data=df).fit()
+      day_anova_table = sm.stats.anova_lm(day_anova_model, typ=2)
+
+      print("\nANOVA Test for Retweet Count by Day of the Week:")
+      print(day_anova_table)
+
+      p_value_day_anova = day_anova_table['PR(>F)'][0]
+
+      if p_value_day_anova < alpha:
+          print(f"\nConclusion: With a p-value of {p_value_day_anova:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+          print("There is sufficient evidence to suggest that there is a significant difference in the mean retweet_count across different days of the week.")
+      else:
+          print(f"\nConclusion: With a p-value of {p_value_day_anova:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+          print("There is not enough evidence to suggest a significant difference in the mean retweet_count across different days of the week.")
+  else:
+      print("DataFrame is empty, cannot perform ANOVA by Day of the Week.")
+
+  # For timing of tweets and sentiment distribution (Chi-Squared)
+  # Day of the week vs. Sentiment
+  contingency_table_day_sentiment = pd.crosstab(df['tweet_created'].dt.day_name(), df['airline_sentiment'])
+  contingency_table_day_sentiment = contingency_table_day_sentiment.reindex(index=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
+
+  if not contingency_table_day_sentiment.empty and contingency_table_day_sentiment.shape[0] > 1 and contingency_table_day_sentiment.shape[1] > 1:
+      chi2_stat_day_sentiment, p_value_day_sentiment, dof_day_sentiment, expected_day_sentiment = chi2_contingency(contingency_table_day_sentiment)
+
+      print("\nChi-Squared Test for Independence (Day of Week vs. Sentiment)")
+      print(f"Chi-squared statistic: {chi2_stat_day_sentiment:.4f}")
+      print(f"P-value: {p_value_day_sentiment:.4f}")
+      print(f"Degrees of Freedom: {dof_day_sentiment}")
+
+      alpha = 0.05
+      if p_value_day_sentiment < alpha:
+          print(f"\nConclusion: With a p-value of {p_value_day_sentiment:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+          print("There is sufficient evidence to suggest that the sentiment distribution differs significantly across different days of the week.")
+      else:
+          print(f"\nConclusion: With a p-value of {p_value_day_sentiment:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+          print("There is not enough evidence to suggest a significant difference in sentiment distribution across different days of the week.")
+  else:
+      print("Not enough data in the contingency table (Day of Week vs. Sentiment) to perform a reliable Chi-Squared test.")
+      print(f"Table shape: {contingency_table_day_sentiment.shape}")
+
+  # Hour of the day vs. Sentiment
+  contingency_table_hour_sentiment = pd.crosstab(df['tweet_created'].dt.hour, df['airline_sentiment'])
+  min_tweets_per_hour = 10
+  contingency_table_hour_sentiment_filtered = contingency_table_hour_sentiment[contingency_table_hour_sentiment.sum(axis=1) >= min_tweets_per_hour]
+
+
+  if not contingency_table_hour_sentiment_filtered.empty and contingency_table_hour_sentiment_filtered.shape[0] > 1 and contingency_table_hour_sentiment_filtered.shape[1] > 1:
+      chi2_stat_hour_sentiment, p_value_hour_sentiment, dof_hour_sentiment, expected_hour_sentiment = chi2_contingency(contingency_table_hour_sentiment_filtered)\
+      print("\nChi-Squared Test for Independence (Hour of Day vs. Sentiment - filtered)")
+      print(f"Chi-squared statistic: {chi2_stat_hour_sentiment:.4f}")
+      print(f"P-value: {p_value_hour_sentiment:.4f}")
+      print(f"Degrees of Freedom: {dof_hour_sentiment}")
+
+      alpha = 0.05
+      if p_value_hour_sentiment < alpha:
+          print(f"\nConclusion: With a p-value of {p_value_hour_sentiment:.4f} (less than alpha={alpha}), we reject the null hypothesis (H0).")
+          print("There is sufficient evidence to suggest that the sentiment distribution differs significantly across different hours of the day.")
+      else:
+          print(f"\nConclusion: With a p-value of {p_value_hour_sentiment:.4f} (greater than or equal to alpha={alpha}), we fail to reject the null hypothesis (H0).")
+          print("There is not enough evidence to suggest a significant difference in sentiment distribution across different hours of the day.")
+  else:
+      print("\nNot enough data in the filtered contingency table (Hour of Day vs. Sentiment) to perform a reliable Chi-Squared test.")
+      print(f"Filtered table shape: {contingency_table_hour_sentiment_filtered.shape}")
+```
+
+<img width="1232" height="416" alt="image" src="https://github.com/user-attachments/assets/a99f3009-c69c-4d36-9ec0-6144c3574051" />
+<img width="1042" height="308" alt="image" src="https://github.com/user-attachments/assets/be8508a2-d291-4e33-b3cd-79ad98069457" />
+
+
+- Are there specific days or times (tweet_created) when negative sentiment tweets are more prevalent, suggesting periods of heightened
+``` python
+  # Null Hypothesis (H0): The proportion of negative sentiment tweets is consistent across different days of the week and times of the day.
+  # Alternative Hypothesis (H1): The proportion of negative sentiment tweets is significantly higher on certain days of the week or during specific times of the day.
+
+  print("\nOverall Hypothesis Test Conclusion (Timing of Negative Sentiment)")
+  alpha = 0.05
+  if p_value_day_sentiment < alpha or p_value_hour_sentiment < alpha:
+      print("Based on the Chi-Squared tests, we reject the Null Hypothesis (H0).")
+      print("There is sufficient evidence to suggest that the proportion of negative sentiment tweets varies significantly across different days of the week and/or times of the day.")
+      print("This supports the Alternative Hypothesis (H1) that negative sentiment is significantly higher on certain days or times.")
+  else:
+      print("Based on the Chi-Squared tests, we fail to reject the Null Hypothesis (H0).")
+      print("There is not enough evidence to suggest that the proportion of negative sentiment tweets varies significantly across different days of the week or times of the day.")
+      print("The observed distribution is consistent with the Null Hypothesis (H0) that the proportion is consistent.")
+  ```
+
+<img width="1368" height="115" alt="image" src="https://github.com/user-attachments/assets/79e3a8e6-b551-4f3a-a89d-af457e9d2976" />
+
+
+**2). Machine learning Approach**
+
+``` python
+df.groupby('airline_sentiment')['text'].count()
+```
+<img width="230" height="110" alt="image" src="https://github.com/user-attachments/assets/cf57b44f-3a70-4547-a0db-d903a59462c4" />
+
+Pie chart of the sentiment airlines
+``` python
+
+sentiment_counts = df['airline_sentiment'].value_counts()
+fig = px.pie(values=sentiment_counts.values, 
+             names=sentiment_counts.index, 
+             title='Distribution of Airline Sentiments',
+             hole=0.3)
+fig.show()
+```
+
+<img width="1717" height="426" alt="image" src="https://github.com/user-attachments/assets/6fa4ed0e-6592-4489-8fba-c23e0d424964" />
+
+Outlook of the texts
+
+``` python
+df['text']
+```
+<img width="480" height="254" alt="image" src="https://github.com/user-attachments/assets/20b10076-cb96-493c-96ba-94eef4530657" />
+
+Text cleaning
+
+``` python
+stop_words = set(stopwords.words('english'))
+
+def comprehensive_clean(text):
+    text = str(text).lower()
+    text = re.sub(r'https?://\S+|www\.\S+', '', text)
+    text = re.sub(r'\S+@\S+', '', text)
+    text = text.replace('@', '')
+    text = re.sub(r'^\w+\s+', '', text)    
+    text = re.sub(r'[^\w\s]', '', text)
+    words = word_tokenize(text)
+    cleaned_words = [w for w in words if w not in stop_words and w.strip() != '']
+    return " ".join(cleaned_words).strip()
+
+df['cleaned_text'] = df['text'].apply(comprehensive_clean)
+```
+
+``` python
+df['cleaned_text']
+```
+<img width="489" height="248" alt="image" src="https://github.com/user-attachments/assets/a9f28c77-68f0-4540-aa0d-a49bf78841e6" />
+
+Now, let's make into seperate dataframe just to analyse the text and the sentiment
+``` python
+text_dataframe = df[['cleaned_text', 'airline_sentiment']]
+text_dataframe.head()
+```
+<img width="524" height="198" alt="image" src="https://github.com/user-attachments/assets/4824b4ee-3a50-41dc-b844-cfed185a681c" />
+
+Converting the sentiment from categorical into numerical
+``` python
+text_dataframe['airline_sentiment'].map({'negative': 0, 'neutral': 1, 'positive': 2})
+```
+
+<img width="445" height="253" alt="image" src="https://github.com/user-attachments/assets/7060cf34-ff56-41a7-8001-bdaca0999db9" />
+
+Now, let's choose our featrures and target
+
+``` python
+X = text_dataframe['cleaned_text']
+y = text_dataframe['airline_sentiment']
+```
+
+Splitting of data
+
+``` python
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+```
+
+Label encoding on our data
+
+``` python
+le = LabelEncoder()
+y_train = le.fit_transform(y_train)
+y_test = le.transform(y_test)
+```
+
+TF-IDF vecytroization for word frequencies
+
+``` python
+f = TfidfVectorizer()
+X_train = f.fit_transform(X_train)
+X_test = f.transform(X_test)
+
+print(X_train.shape,X_test.shape)
+```
+
+<img width="293" height="49" alt="image" src="https://github.com/user-attachments/assets/00e447d7-8354-4d1b-8c53-23026bfebb7a" />
+
+Converting into dense array for inout purpose
+
+``` python
+X_train_dense = X_train.toarray()
+X_test_dense = X_test.toarray()
+```
+
+Gaussian Naive Bayes algorithm
+
+``` python
+params = {
+        'alpha':[0.01, 0.1, 1, 10]
+        }
+gnb = GaussianNB()
+clf = GridSearchCV(gnb, params, scoring="f1_weighted", cv=3)
+
+# Fit and predict
+gnb.fit(X_train_dense, y_train)
+y_pred_gnb = gnb.predict(X_test_dense)
+
+acc_gnb = accuracy_score(y_test, y_pred_gnb)
+
+print(f"Gaussian Naive Bayes Accuracy: {acc_gnb}")
+print(classification_report(y_test, y_pred_gnb))
+```
+
+<img width="462" height="214" alt="image" src="https://github.com/user-attachments/assets/997aceb6-6d35-4915-beca-2264bd4beb95" />
+
+We notice that Gaussian Naive Bayes algorithm gives us the accuracy of 52%. Now, let's look into mulitnominal naive bayes approach
+
+``` python
+# Multinomial NB
+
+mnb = naive_bayes.MultinomialNB()
+clf = GridSearchCV(mnb, params, scoring="f1_weighted", cv=3)
+
+mnb.fit(X_train_dense, y_train)
+
+y_pred_mnb = mnb.predict(X_test_dense)
+
+acc_mnb = accuracy_score(y_test, y_pred_mnb)
+print(f"Multinomial Naive Bayes Accuracy: {acc_mnb}")
+print(classification_report(y_test, y_pred_mnb))
+```
+<img width="445" height="222" alt="image" src="https://github.com/user-attachments/assets/38cfa1a2-47e4-4d32-b357-1b3146befa86" />
+
+Now, let's check into other algorithms liek logistic regression, Linear SVm, Random forest
+
+``` python
+# Logistic Regression
+lr = LogisticRegression(max_iter=1000, random_state=42, class_weight='balanced')
+lr.fit(X_train_dense, y_train)
+y_pred_lr = lr.predict(X_test)
+print("Logistic Regression Accuracy:", (y_pred_lr == y_test).mean())
+print(classification_report(y_test, y_pred_lr))
+
+# Linear SVM
+svm = LinearSVC(max_iter=2000, random_state=42, class_weight='balanced')
+svm.fit(X_train_dense, y_train)
+y_pred_svm = svm.predict(X_test)
+print("\nLinear SVM Accuracy:", (y_pred_svm == y_test).mean())
+print(classification_report(y_test, y_pred_svm))
+
+# Random Forest (using dense data)
+rf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1, class_weight='balanced')
+rf.fit(X_train_dense, y_train)
+y_pred_rf = rf.predict(X_test_dense)
+print("\nRandom Forest Accuracy:", (y_pred_rf == y_test).mean())
+print(classification_report(y_test, y_pred_rf))
+```
+
+<img width="482" height="462" alt="image" src="https://github.com/user-attachments/assets/65d6a89c-f45b-49b3-bfaa-31f3a99af16e" />
+<img width="453" height="217" alt="image" src="https://github.com/user-attachments/assets/c7fab7aa-7371-4018-8a26-7fd43970c852" />
+
+Now, let's compare all the machine learning mdoels to compare the perfromance of the model
+
+``` python
+# Create a comparison of all models
+models = {
+    'Gaussian NB': y_pred_gnb,
+    'Multinomial NB': y_pred_mnb,
+    'Logistic Regression': y_pred_lr,
+    'Linear SVM': y_pred_svm,
+    'Random Forest': y_pred_rf
+}
+
+accuracies = []
+for model_name, y_pred in models.items():
+    acc = accuracy_score(y_test, y_pred)
+    accuracies.append(acc)
+
+# Plot accuracies
+plt.figure(figsize=(10, 6))
+plt.bar(models.keys(), accuracies, color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', "#7b16da"])
+plt.title('Model Accuracy Comparison', fontsize=14, fontweight='bold')
+plt.ylabel('Accuracy', fontsize=12)
+plt.xlabel('Models', fontsize=12)
+plt.ylim([0, 1])
+for i, acc in enumerate(accuracies):
+    plt.text(i, acc + 0.02, f'{acc:.3f}', ha='center')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+# Confusion matrices for each model
+fig, axes = plt.subplots(2, 3, figsize=(22, 18)) 
+axes = axes.flatten()
+
+for idx, (model_name, y_pred) in enumerate(models.items()):
+    cm = confusion_matrix(y_test, y_pred)
+    
+    sns.heatmap(cm, annot=True, fmt='d', 
+                cmap=sns.color_palette("Spectral", as_cmap=True),
+                ax=axes[idx], cbar=False,
+                annot_kws={"size": 14, "color": "black", "weight": "bold"})
+    
+    axes[idx].set_title(f'{model_name} Confusion Matrix', fontweight='bold', fontsize=16)
+    axes[idx].set_ylabel('True Label', fontsize=14)
+    axes[idx].set_xlabel('Predicted Label', fontsize=14)
+
+axes[5].remove()
+
+plt.subplots_adjust(wspace=0.2, hspace=0.2)
+plt.show()
+```
+
+<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/eb5f4674-2f37-4047-825e-18ac7234eaef" />
+<img width="1773" height="1478" alt="image" src="https://github.com/user-attachments/assets/39e1a8d2-47f8-4f3f-9e83-747f5915f6ed" />
+
+**3). Deep learning Approach**
+
+Features and target variables for our Neural network model
+
+``` python
+X = text_dataframe['cleaned_text']
+y = text_dataframe['airline_sentiment']
+```
+
+``` python
+from collections import Counter
+
+# Word frequency analysis
+
+all_words = ' '.join(text_dataframe['cleaned_text']).split()
+word_freq = Counter(all_words)
+top_words = word_freq.most_common(20)
+
+plt.figure(figsize=(15, 8))
+plt.barh([word[0] for word in top_words], [word[1] for word in top_words])
+plt.xlabel('Frequency')
+plt.title('Top 20 Most Frequent Words')
+plt.tight_layout()
+plt.show()
+
+# 2. Word frequency by sentiment
+fig, axes = plt.subplots(1, 3, figsize=(18, 10))
+sentiments = ['negative', 'neutral', 'positive']
+
+for idx, sentiment in enumerate(sentiments):
+    sentiment_text = ' '.join(df[df['airline_sentiment'] == sentiment]['cleaned_text'])
+    words = sentiment_text.split()
+    word_freq_sentiment = Counter(words)
+    top_words_sentiment = word_freq_sentiment.most_common(15)
+    
+    axes[idx].barh([w[0] for w in top_words_sentiment], [w[1] for w in top_words_sentiment])
+    axes[idx].set_xlabel('Frequency')
+    axes[idx].set_title(f'Top 15 Words in {sentiment.capitalize()} Tweets')
+
+plt.tight_layout()
+plt.show()
+
+# 3. Text length analysis by sentiment
+df['text_length'] = df['cleaned_text'].apply(lambda x: len(x.split()))
+
+plt.figure(figsize=(12, 5))
+for sentiment in sentiments:
+    data = df[df['airline_sentiment'] == sentiment]['text_length']
+    plt.hist(data, alpha=0.6, label=sentiment, bins=30)
+plt.xlabel('Number of Words')
+plt.ylabel('Frequency')
+plt.title('Text Length Distribution by Sentiment')
+plt.legend()
+plt.show()
+
+# 4. Average sentiment by airline
+airline_sentiment = df.groupby('airline')['airline_sentiment'].value_counts().unstack(fill_value=0)
+airline_sentiment.plot(kind='bar', figsize=(14, 6))
+plt.title('Sentiment Distribution by Airline')
+plt.xlabel('Airline')
+plt.ylabel('Count')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+```
+
+<img width="1490" height="790" alt="image" src="https://github.com/user-attachments/assets/e02c51fa-0536-42c8-8013-f2f4c5dd72e2" />
+
+<img width="1790" height="989" alt="image" src="https://github.com/user-attachments/assets/91dcfd96-69a2-45d3-8e65-59059b657d1f" />
+
+<img width="1014" height="470" alt="image" src="https://github.com/user-attachments/assets/9d70b19f-b90f-497c-a6d4-c5d240d8f0eb" />
+
+<img width="1389" height="590" alt="image" src="https://github.com/user-attachments/assets/d960106a-336b-458b-912b-a277dcbbcba4" />
+
+Now, let's check for the words that was expressed most of the time by the passengers.
+
+``` python
+from wordcloud import WordCloud
+
+def show_wordcloud(sentiment_type, title):
+    text = " ".join(text_dataframe[text_dataframe['airline_sentiment'] == sentiment_type]['cleaned_text'])
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.title(title)
+    plt.show()
+
+# Visualize positive vs negative
+show_wordcloud('positive', 'Words in Positive Tweets')
+show_wordcloud('negative', 'Words in Negative Tweets')
+```
+<img width="790" height="427" alt="image" src="https://github.com/user-attachments/assets/0c9855f5-a0f3-43fb-ab6d-2b33d5b89355" />
+
+<img width="790" height="427" alt="image" src="https://github.com/user-attachments/assets/95f205dd-d1b2-4e5c-9a10-7847db62fdde" />
+
+Now, let's check for the complaints
+
+``` python
+plt.figure(figsize=(12,6))
+sns.countplot(data=df, y='negativereason', order=df['negativereason'].value_counts().index)
+plt.title('Top Reasons for Negative Sentiment')
+plt.show()
+```
+
+<img width="1175" height="547" alt="image" src="https://github.com/user-attachments/assets/efc3db05-3ca3-4128-af41-6218f3f61042" />
+
+Tokenizations of words
+
+``` python
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from sklearn.preprocessing import LabelEncoder
+
+# Encoding the target labels (negative, neutral, positive)
+le = LabelEncoder()
+y = le.fit_transform(text_dataframe['airline_sentiment']) 
+
+# 2. Tokenize the cleaned text
+max_words = 5000  # Only consider the top 5000 words
+tokenizer = Tokenizer(num_words=max_words, lower=True)
+tokenizer.fit_on_texts(text_dataframe['cleaned_text'].values)
+sequences = tokenizer.texts_to_sequences(df['cleaned_text'].values)
+
+# 3. Pad sequences so every input has the same length
+max_len = 50  # Maximum length of a tweet
+X = pad_sequences(sequences, maxlen=max_len)
+
+# 4. Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+LSTM model development
+
+Long Short-Term Memory (LSTM) is specifically chosen for this sentiment analysis task for several reasons:
+
+Sequential Dependency: Unlike standard ML models that treat words as independent features (Bag of Words), LSTMs are a type of Recurrent Neural Network (RNN) capable of learning long-term dependencies between words in a sentence.
+
+Context Preservation: In sentiment analysis, the meaning of a word can change based on the words that came before it (e.g., "not good"). LSTM uses "gates" to decide what information to keep or discard, allowing it to maintain the context of a tweet over its entire length.
+
+Handling Vanishing Gradients: LSTMs are designed to overcome the vanishing gradient problem common in standard RNNs, making them much more effective at training on text sequences like tweets.
+
+``` python
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout, SpatialDropout1D
+
+
+model = Sequential()
+model.add(Embedding(max_words, 128, input_length=max_len))
+model.add(SpatialDropout1D(0.4))
+model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
+model.add(Dense(3, activation='softmax'))
+
+cb_callback = tensorflow.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+
+model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+batch_size = 32
+epochs = 15
+history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, 
+                    validation_data=(X_test, y_test), verbose=2)
+```
+
+<img width="870" height="218" alt="image" src="https://github.com/user-attachments/assets/adf3edba-bbb6-435c-82f3-720ee1a25f04" />
+
+Now, let's quickly check for the plot of loss vs accuracy
+
+``` python
+history.history.keys()
+```
+``` python
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+ax = axes.ravel()
+ax[0].plot(history.history['accuracy'], label='Train Accuracy')
+ax[0].plot(history.history['val_accuracy'], label='Validation Accuracy')
+ax[0].set_title('Model Accuracy')
+ax[0].set_xlabel('Epoch')
+ax[0].set_ylabel('Accuracy')
+ax[0].legend()
+
+ax[1].plot(history.history['loss'], label='Train Loss')
+ax[1].plot(history.history['val_loss'], label='Validation Loss')
+ax[1].set_title('Model Loss')
+ax[1].set_xlabel('Epoch')
+ax[1].set_ylabel('Loss')
+ax[1].legend()
+
+plt.tight_layout()
+plt.show()
+```
+
+<img width="1390" height="490" alt="image" src="https://github.com/user-attachments/assets/e2754029-9ba4-4bf8-bc55-d212dce03d31" />
+
+Predictions of the test set
+
+``` python
+def predict_sentiment(text):
+    cleaned = comprehensive_clean(text)
+    seq = tokenizer.texts_to_sequences([cleaned])
+    padded = pad_sequences(seq, maxlen=max_len)
+    pred = model.predict(padded)
+    return le.inverse_transform([np.argmax(pred)])[0]
+
+# Example Prediction
+new_tweet = "The flight was late and the service was terrible."
+prediction = predict_sentiment(new_tweet)
+print(f"Tweet: {new_tweet} \nPredicted Sentiment: {prediction}")
+
+# To get predictions for the entire test set
+y_pred_probs = model.predict(X_test)
+y_pred = np.argmax(y_pred_probs, axis=1)
+
+# Evaluation
+from sklearn.metrics import classification_report
+print(classification_report(y_test, y_pred, target_names=le.classes_))
+```
+
+<img width="488" height="291" alt="image" src="https://github.com/user-attachments/assets/becb7625-7465-49b9-8566-3152785d1d2c" />
+
+We notice our model performs well about 81% and the reason I haven't fine tuned it as the model performance will decrease and rely on the majority classes and missclassification of sentiments will take place. We can conclude that deep neural network like LSTM perfromed well than other machine learning models.
+
+#### Model Deployment
+
+**Steps for model deployment:**
+
+**Phase 1: The Foundation (Local Machine)**
+
+- This is where you write code and test things before they ever touch the internet. Install Python & Pip: Download the latest 3.x version from [python](python.org). Verify: Open your terminal and type `python --version.`. Install Git: Download Git and create a GitHub account. Action: Run `git config --global user.name "Your Name"` to link your machine to your identity. Install Docker Desktop: This is the most important tool. It allows you to package your code so it runs exactly the same on your laptop as it does on a server. Action: Sign up for Docker Hub while you're at it—this will be your "Container Registry."
+
+
+**Phase 2: The Project Structure (Code & Environment)**
+
+- Now we organize your actual AI/ML project. Create a Project Folder: `mkdir my-ml-app && cd my-ml-app.`. Set up a Virtual Environment: * Run `python -m venv venv.` Activate it: `source venv/bin/activate (Mac) or .\venv\Scripts\activate (Windows).`
+
+Why? This keeps your ML libraries (like Scikit-Learn or PyTorch) from clashing with other projects. Create a requirements.txt: List your tools/packages here (e.g., pandas, scikit-learn, flask). Install them using `pip install -r requirements.txt.`
+before that in order to get the versions of packages you need to type on you terminal `pip list`.
+
+
+**Phase 3: The "Shipment" (Containerization & Registry)**
+
+- You have code; now you need to "box" it up. Create a Dockerfile: This is a script that tells Docker: "Hey, grab Python, copy my code, install my requirements, and start the model". Build your Image: Run `docker build -t my-ml-model` Push to Registry: Log into Docker Hub in your terminal (docker login) and push your image so the cloud can see it: docker `push username/my-ml-model.` Note: Inisde the docker file make sure to check the the website for [tags](https://hub.docker.com/_/python) for python tags for containerization purpose. 
+
+**Phase 4: Going Live & Automating**
+
+- Manual uploads are for beginners; pros use automation to ensure the "live" version of the app always matches the "code" version. Cloud Hosting: Choose a provider (like GCP or AWS) to give your model a permanent home on the internet. CI/CD Pipeline: Use GitHub Actions to automate the "Build and Push" process. Every time you save code to GitHub, the cloud updates itself automatically. Basic Oversight: Use your provider’s built-in tools to check if the server is getting too hot or running out of memory.
+
+**Phase 5: The Cloud & Automation (Deployment & CI/CD)**
+This is where your project goes "Live." Cloud Account (AWS/GCP/Azure): Pick one. For beginners, Google Cloud (GCP) or DigitalOcean is often more intuitive than AWS. CI/CD (GitHub Actions): Firstly you need to have `test.py` file to test your machine learning models and to display your metrics on the ml flow site.
+by runnig the commands 
+
+Create a folder in your project: `.github/workflows/.` under that folder you need tp
+
+Add a .yml file that says: "Every time I push code to GitHub, rebuild my Docker image and send it to the cloud."
+
+Monitoring: Once the model is running on a cloud server, use the cloud provider's built-in dashboard (like [AWS CloudWatch](https://www.google.com/aclk?sa=L&ai=DChsSEwiR8o2AxYuTAxU9pWYCHdGpHZkYACICCAEQABoCc20&ae=2&aspm=1&co=1&ase=2&gclid=Cj0KCQiAk6rNBhCxARIsAN5mQLvBCchY7WAA6YRvdKasOLYgUzh-bzOExjKKGXpl9h121CAKJv6m2CgaAk3BEALw_wcB&cid=CAASugHkaLsOwyJylyktWkPVLqqd8Lcjg1OYj9NAhBh1mGCoPguHKPVc_KBPZ4PKNY2t1BLDSBEd0S0FlDSHue2tA9SDIvrlUklP5rMsXUaWpjzojuwwppLTlUHEun8FUdRYUWTm96FkyG8y2ZctgVPLwc5_qRPD3fvGay79dnQE0fIzN50U25bGF-cFodfLm21VPoCthmmzss5FOQQQAxSjW9ixDdi2wxYr5xTS62DUF-4YG_TmIEpCaQtv9FE&cce=2&category=acrcp_v1_35&sig=AOD64_10-y4cbZy_ErCQ7ntyY2a2NIphRA&q&nis=4&adurl&ved=2ahUKEwjKqIeAxYuTAxX_zjgGHbgoK7wQ0Qx6BAgWEAE) to watch for errors or high CPU usage.
+
+**Phase 5: The "Watchtower" (Prometheus & Grafana):**
+
+This is the final checkmark on your list.
+
+1). Prometheus: This tool "scrapes" data from your running model (how many users visited? did it crash?).
+
+2). Grafana: This connects to Prometheus to show you beautiful, real-time dashboards of your model's health.
+
+Steps:
+
+- Make sure to write the code for `train.apy`, `app.py` for the purpose flask for API creation, `Dockerfile` for containerization. Also to write the down all the versions of gthe packages used in your model developoment by running it on your terminal.(`pip list`)
+
+- Acess your folder, `cd folder_name` where you have cloned it. Hint: if you have two different python version I suggest you to remove the base, by running the command on the terminal `conda deactivate`
+
+- Activate the environment: source `venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows), a green colored text of (venv) will appear onto the next path.
+
+- Install all your dependencies: by running it on the terminal `pip install -r requirements.txt`
+
+- Make sure to run the code for `train.py` to run to create the temporary files for containerization in dockerhub.
+  
+-  In order to build images on your docker hub, make sure to be signed in you dockerhub desktop and on the official website for the engine to be active while building the image. run the command to buidl the image that is `docker build -t sentiment-app .` and to run the image onto your desktop then run this command `docker run -d -p 5000:5000 sentiment-app`. 
+
+- Also to view the metrics of your models on ML flow site. Once it is sucessfully loaded, you need to run the command the `mlflow ui` to view the metrics of your model on the site.
+ 
+- To make sure that you have your test badge on your github repo, install `pip install pytest pytest-cov` make sure to code and name it `test_logic.py` and then create a file name `.github/workflows/test.yml` in your repo and paste the below mentioned code.
+
+``` yaml
+name: Test and Coverage Badge
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+      - name: Build coverage file
+        run: |
+          pytest --cov=./ --cov-report=xml
+      - name: Create Coverage Badge
+        uses: orgoro/coverage-badge-hook@v1.0.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+```
+At the top of your README.md, add this line. It will stay gray until your first successful "Push," then it will turn green with your actual percentage:
+![Coverage](https://img.shields.io/badge/coverage-tested-green)
+
+  
+ 
+### Insights
+Based on the analysis from Twitter interactions regarding the airlines is mentioned bekow
+
+1. **Customer Loyalty & Retention**
+
+- The most negative reasons among the airlines were Miscellaneous reasons, Custoemr Support, flight delays.
+
+ a. Delta, Southwest, United had miscllaneous problems like online cancellation, flight service, food service, longer wait time, exchange of seats for reservation purpose, server issues on the portals for  booking nor cancellation,wait time for bag checks 
+
+ b. American, US Airways, United, Southwest Airlines faced Custoemr Support issues.
+
+ c. Booking problems tooks place with United airways.
+
+ d. American had delayed flights.
+
+- We see that the passengers had faced miscallenous issues, Customer service issues, delay in flights
+
+- The Airline Sentiment Proportion tells us that Virgin America airline had the highest positive tweets. Whereas, United, US Airways, American ailrines had the most negative tweets.
+
+2. **Demographic & Geographic Analysis**
+
+- A large portion of tweets (over 3,000 negative) lack location data, indicating a potential gap for geographical analysis.
+
+- High volumes of negative tweets originate from major U.S. cities like Boston, Chicago, New York (various entries), Los Angeles, and Washington D.C., likely reflecting high travel volumes.
+
+-  "No Timezone": Similar to location, a significant number of tweets (over 3,000 negative) are missing timezone information, impacting time-based analysis.
+
+- "Eastern Time (US & Canada)" accounts for the highest volume of tweets across all sentiments, as expected due to its population density.
+
+- Central Time (US & Canada)" and "Pacific Time (US & Canada)" also show substantial tweet volumes, predominantly negative.
+
+- Timezones like "Quito," "London," "Amsterdam," and "Sydney" indicate the global reach of the tweets, with "Quito" showing a surprisingly high number of negative tweets.
+
+- The proportion of negative sentiment remains high across diverse locations. Many cities, including Washington DC, NYC, Brooklyn, NY, San Francisco, and Chicago, show negative sentiment proportions above 65%, with some even exceeding 70%.
+
+- "No location" tweets show a substantial negative sentiment (around 66%), reinforcing the idea that a large segment of the data lacks specific geographical context but still expresses negative feedback.
+
+- While some locations like Dallas, TX, show a relatively lower proportion of negative sentiment (46.29%), with higher neutral and positive proportions compared to other cities. This could indicate regional differences in service quality or customer expectations.
+
+- Quito: Stands out with a very high proportion of negative sentiment (70.8%), suggesting a particularly challenging experience for users in this timezone.
+
+- Amsterdam: Shows a significantly lower proportion of negative sentiment (48.6%) and a much higher proportion of neutral sentiment (35.1%), making it an outlier compared to other timezones. This might indicate better service or different tweeting habits.
+
+- Hawaii: Also exhibits a relatively higher neutral proportion (25%) compared to many other timezones.
+
+- Distribution of Negative Reasons by Tweet Location are:
+
+1. Chicago - Bad flights, Can't tell.(Personal issue's, Hygeiene issue's, Mannerism, food, travel safetiness and wwellness).
+
+2. Austin, TX - Cancelled flights, Customer Support Issue, Flight Booking problems, Other Issues.
+
+3. Boston, MA - Flight Attendant complaints, Lost Luggage, other issue's, Late flights.
+
+4.  Brooklyn, NY - Late flights, Longlines.
+
+- Distribution of Negative Reasons by User Timezone are:
+
+1. Alaska - Can't tell, Cancelled flights, Customer Support Issue, Flight Booking problems, Late flights.
+
+2. Atlantic time - Lost Luggage, Long lines, Late flights 
+
+3. Arizona - Bad flights.
+
+4. Amsterdam - Other issue's.
+
+- In the above stats, we see that the other's and Customer support issue's were the main concerns where the passengers have been facing across all locations and time zones.
+
+3. Program Effectiveness & Customer Behavior
+
+- Around 62% were most of the negative tweets across the airlines.
+
+- The peak time of tweets was in the morning and night.
+
+- Sunday ranks the most number of tweets in the days of the week as well as hourly basis and the least numebr of tweets are on Wednesday and Thursday.
+
+### Recommendations
+**1. Enhancing Customer Loyalty & Retention**
+
+- Address Core Negative Drivers: Implement focused strategies to mitigate the impact of "Miscellaneous reasons," "Customer Support issues," and "Flight delays," as these are the most prevalent sources of negative sentiment.
+
+- Deconstruct "Miscellaneous" Issues: Conduct deeper qualitative analysis (e.g., text mining, manual review) on tweets categorized as "Miscellaneous" to identify specific, recurring underlying problems (e.g., online cancellation difficulties, food service, seat exchange issues, portal server problems, long wait times for bag checks). Once identified, create new actionable categories and develop targeted solutions.
+
+- Elevate Customer Support:
+
+  - Targeted Training: Provide enhanced training for customer service teams,  particularly for American, US Airways, United, and Southwest Airlines, focusing on empathy, efficient problem resolution, and communication skills.
+
+  - Resource Allocation: Increase staffing or optimize scheduling for customer support channels (phone, chat, social media) to reduce response times and improve resolution rates.
+
+- Improve Operational Reliability:
+
+  - Flight Delay Reduction: American Airlines should specifically focus on initiatives to reduce flight delays, such as optimizing scheduling, improving maintenance turnaround times, and enhancing ground operations efficiency.
+
+  - Booking System Optimization: United Airways must prioritize resolving "Booking problems" by improving the user experience and reliability of their online booking platforms.
+
+- Learn from Best Practices: Investigate the factors contributing to Virgin America's highest positive tweet proportion. Analyze their operational, communication, and customer service strategies to identify transferable best practices.
+
+**2. Leveraging Demographic & Geographic Insights**
+
+- Enhance Data Granularity:
+  - Incentivize Location/Timezone Sharing: Explore ways to encourage users to enable location/timezone sharing on their tweets (if privacy policies permit) to enrich the dataset for more precise geographical and temporal analysis.
+
+  - Geolocation Inference: Implement or utilize tools to infer location/timezone data where explicitly missing, to gain a more complete picture of regional issues.
+
+- Implement Regionalized Customer Service:
+  - Staffing & Language: Adjust customer service staffing based on high negative tweet volumes from major U.S. cities (Boston, Chicago, New York, Los Angeles, Washington D.C.) and dominant timezones (Eastern, Central, Pacific). Consider language support for international timezones like Quito.
+  - Localized Training: Train customer service agents on prevalent negative reasons specific to their region (e.g., Austin agents on cancellations, Boston on flight attendant complaints/lost luggage, Chicago on "Bad Flights").
+
+- Targeted Operational Improvements (Geographic): Address specific operational issues identified in high-complaint cities (e.g., focus on reducing "Late Flights" and "Longlines" in Brooklyn, "Cancelled Flights" and "Other Issues" in Austin, TX).
+
+- Analyze Positive Outliers: Study the practices or demographics in locations/timezones with lower negative proportions (e.g., Dallas, TX; Amsterdam; Hawaii) to identify successful strategies that could be replicated elsewhere.
+
+- Proactive Localized Communication: Issue timely and localized alerts or updates for known issues (e.g., weather-related delays, operational disruptions) to manage customer expectations and potentially reduce negative tweets from affected regions.
+
+**3. Optimizing Program Effectiveness & Customer Behavior Response**
+
+- Prioritize Negative Tweet Resolution: Given that approximately 62% of tweets are negative, dedicate substantial resources to rapid response and resolution of these complaints. Prompt and effective resolution can mitigate damage, improve individual customer satisfaction, and potentially shift sentiment.
+
+- Align Staffing with Peak Hours: Optimize customer service and social media monitoring team schedules to align with peak tweeting times (morning and night) to ensure immediate engagement with customer concerns.
+
+- Strengthen Weekend Readiness: Allocate additional customer support and operational resources for Sundays, as this day consistently shows the highest volume of tweets. This proactive approach can manage increased passenger activity and potential issues.
+
+- Strategic Communication Timing: Consider the lower tweet volumes on Wednesdays and Thursdays for scheduling non-urgent communications, marketing campaigns, or surveys, as they might achieve higher visibility during these quieter periods.
+
+- Proactive Issue Management: For recurring issues identified (e.g., "Customer Support," "Flight Delays"), develop proactive communication strategies (e.g., automated updates, self-service options) to address concerns before they escalate into public negative tweets.
