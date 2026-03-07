@@ -1,23 +1,28 @@
-# 1. Use an official Python base image (matching your 3.10 version)
+# 1. Base Image
 FROM python:3.13-slim
 
-# 2. Set the directory inside the container
+# 2. Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# 3. Working Directory
 WORKDIR /app
 
-# 3. Copy only the requirements first (helps with caching)
-COPY requirements.txt .
-
 # 4. Install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Download NLTK data (Critical for your sentiment analysis)
+# 5. Download NLTK data
 RUN python -m nltk.downloader stopwords
 
-# 6. Copy the rest of your code and models
-COPY . .
+# 6. Copy local model files (Ensure these exist before building!)
+COPY Tweets.csv .
+COPY train.py .
+COPY app.py .
+COPY model.pkl .     
+COPY vectorizer.pkl .
 
-# 7. Expose the port Flask runs on
+# 7. Expose Port
 EXPOSE 5000
 
-# 8. Command to run your app using Gunicorn (production grade)
+# 8. Start Gunicorn (Production server)
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
