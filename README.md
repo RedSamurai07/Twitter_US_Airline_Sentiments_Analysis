@@ -64,8 +64,16 @@
 
 ### Tools
 - Excel : Google Sheets - Check for data types, Table formatting
-- Python: VS code / Google Colab - Data Preparation and pre-processing, Exploratory Data Analysis, Descriptive Statistics, inferential Statistics, Data manipulation, Data Visualization, Feature Engineering, Hypothesis Testing, Machine learning, Deep learning, Tokenization, Model Training and evaluation, Model development
-  
+- Python: VS code / Google Colab - Data Preparation and pre-processing, Exploratory Data Analysis, Descriptive Statistics, inferential Statistics, Data manipulation, Data Visualization, Feature Engineering, Hypothesis Testing, Machine learning, Deep learning, Tokenization, Model Training and evaluation, Model development.
+- Model Deployment: Docker, EC2, MLflow
+- CI/CD: GitHub Actions
+- Version Control: Git
+- Containerization: Docker
+- Infrastructure: AWS EC2
+- Model Management: MLflow
+- Testing: PyTest
+- Documentation: Markdown
+
 ### Analysis
 1). Python
 - Importing Libraries
