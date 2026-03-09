@@ -1,4 +1,5 @@
-# Twitter_US_Airline_Sentiments_Analysis
+# Twitter US Airline Sentiments Analysis ✈️
+![CI Status](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions/workflows/test.yml/badge.svg)
 
 ## Table of contents
 - [Project Overview](#project-overview)

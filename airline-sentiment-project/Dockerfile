@@ -18,8 +18,7 @@ RUN python -m nltk.downloader stopwords
 COPY Tweets.csv .
 COPY train.py .
 COPY app.py .
-COPY model.pkl .     
-COPY vectorizer.pkl .
+COPY model_pipeline.pkl .
 
 # 7. Expose Port
 EXPOSE 5000
