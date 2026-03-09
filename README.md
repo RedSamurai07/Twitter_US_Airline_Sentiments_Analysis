@@ -1357,10 +1357,6 @@ The final verification layer.
 1). Prometheus: Collects metrics from your deployed model (traffic volume, crash reports).
 2). Grafana: Interfaces with Prometheus to display dynamic, visual dashboards of your model's performance.
 
-Model deplyed Result:
-
-<img width="496" height="189" alt="image" src="https://github.com/user-attachments/assets/0bcd215b-bd17-4e9c-9fb1-58727fec6bc4" />
-
 ### Insights
 Based on the analysis from Twitter interactions regarding the airlines is mentioned bekow
 
