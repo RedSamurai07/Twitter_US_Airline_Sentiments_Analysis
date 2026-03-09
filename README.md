@@ -1356,20 +1356,6 @@ The final verification layer.
 1). Prometheus: Collects metrics from your deployed model (traffic volume, crash reports).
 2). Grafana: Interfaces with Prometheus to display dynamic, visual dashboards of your model's performance.
 
-**Implementation Steps:**
-
-- Develop code for train.py, app.py (Flask for API endpoints), Dockerfile (for containerization). Document all package versions using pip list.
-
-- Navigate to your directory: `cd folder_name`. Tip: If multiple Python versions exist, deactivate conda base: conda deactivate
-
-- Enable the environment: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows), indicated by green (venv) text.
-
-- Install dependencies: Execute `pip install -r requirements.txt`
-
-- Execute train.py to generate necessary files for Docker Hub containerization: python train.py
-
-- For image creation on Docker Hub, ensure Docker Desktop login and active engine, then build with `docker build -t sentiment-app .` and launch with `docker run -d -p 5000:5000 sentiment-app.`
-
 - To visualize model metrics on MLflow, run `mlflow ui` after successful loading.
 For GitHub test badges, install `pip install pytest pytest-cov`, create test_logic.py, and establish .github/workflows/test.yml with this configuration:
 
