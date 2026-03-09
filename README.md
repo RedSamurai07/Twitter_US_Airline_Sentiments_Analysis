@@ -1359,6 +1359,14 @@ The final verification layer.
 - To visualize model metrics on MLflow, run `mlflow ui` after successful loading.
 For GitHub test badges, install `pip install pytest pytest-cov`, create test_logic.py, and establish .github/workflows/test.yml with this configuration:
 
+**Deployed Model Results:
+<img width="672" height="249" alt="image" src="https://github.com/user-attachments/assets/968dee71-f1fa-47d2-9b69-05f9bcba351e" />
+
+[link](http://52.24.17.53:5000/health)
+
+ML Flow site:
+
+
 
 ### Insights
 Based on the analysis from Twitter interactions regarding the airlines is mentioned bekow
