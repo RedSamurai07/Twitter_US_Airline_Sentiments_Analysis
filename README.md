@@ -1377,7 +1377,7 @@ print(classification_report(y_test, y_pred, target_names=le.classes_))
 
 <img width="557" height="326" alt="image" src="https://github.com/user-attachments/assets/23c3b665-88d5-482b-a9a8-8dca52795f13" />
 
-We notice our model performs well about 81% and the reason I haven't fine tuned it as the model performance will decrease and rely on the majority classes and missclassification of sentiments will take place. We can conclude that deep neural network like LSTM perfromed well than other machine learning models.
+We notice our model performs well about 80% and the reason I haven't fine tuned it as the model performance will decrease and rely on the majority classes and missclassification of sentiments will take place. We can conclude that deep neural network like LSTM perfromed well than other machine learning models.
 
 
 Model Deployment Guide:
