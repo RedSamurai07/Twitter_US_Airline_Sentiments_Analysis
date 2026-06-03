@@ -31,6 +31,21 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    # ⬇️ The MLOps Trick: Generates a tiny, valid 5KB model automatically in the runner cloud
+    - name: Generate Lightweight Dummy Model for Testing
+      run: |
+        python -c "
+        import pickle
+        from sklearn.pipeline import Pipeline
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.linear_model import LogisticRegression
+        pipe = Pipeline([('vec', TfidfVectorizer()), ('clf', LogisticRegression())])
+        pipe.fit(['sample flight tweet text'], ['positive'])
+        with open('model_pipeline.pkl', 'wb') as f:
+            pickle.dump(pipe, f)
+        print('Mock model pipeline successfully generated for CI!')
+        "
+
     - name: Test with pytest
       run: |
         export PYTHONPATH=.
