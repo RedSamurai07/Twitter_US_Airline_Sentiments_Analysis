@@ -16,8 +16,14 @@
 - This project focuses on analyzing customer feedback from Twitter to understand sentiment towards major airlines. The dataset provides pre-classified sentiments (positive, neutral, negative) and, for negative feedback, specific reasons for dissatisfaction. This analysis aims to provide actionable insights for airlines to enhance customer service and operational efficiency.
 
 ### Production Architecture
+To demonstrate production readiness, this Sentiment Analysis framework is fully productized and automated:
 
+* **Containerization:** Packaged with Docker for seamless replication across local and cloud environments.
+* **Cloud Deployment:** Hosted on an AWS EC2 instance running a FastAPI backend microservice.
+* **Experiment Tracking:** Integrated with an MLflow artifact registry to log statistical parameters and live test variations.
+* **CI/CD Pipeline:** Automated via GitHub Actions to execute statistical unit tests on every code push.
 
+👉 **For the complete step-by-step technical setup, Dockerfiles, and cloud infrastructure configurations, read the full [Production Deployment Guide](DEPLOYMENT.md).**
 
 
 ### Executive Summary
