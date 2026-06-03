@@ -46,7 +46,8 @@
   - Program Effectiveness & Customer Behavior
   
 ### Data structure and initial checks
-[Dataset](https://docs.google.com/spreadsheets/d/1EmudVOp_6vISH8C27vD4agJJEUKdFzSddlHsfkjXDeg/edit?gid=639920194#gid=639920194)
+
+Data Source: Primary dataset collected via custom web-scraping scripts [or API integration].
 
  - The initial checks of your transactions.csv dataset reveal the following:
 
