@@ -1,63 +1,146 @@
-import pandas as pd
+import os
 import re
+import pickle
+import pandas as pd
+import nltk
 import mlflow
 import mlflow.sklearn
+
+from nltk.corpus import stopwords
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
-import nltk
-from nltk.corpus import stopwords
-import os
+from sklearn.metrics import accuracy_score, classification_report
+
+# Download stopwords if not already available
+try:
+    nltk.data.find("corpora/stopwords")
+except LookupError:
+    nltk.download("stopwords")
+
+stop_words = set(stopwords.words("english"))
+
+
+def clean_text(text):
+    """
+    Clean tweet text by:
+    - converting to lowercase
+    - removing URLs
+    - removing mentions
+    - removing hashtags
+    - removing special characters
+    - removing stopwords
+    """
+
+    if not isinstance(text, str):
+        return ""
+
+    text = text.lower()
+
+    text = re.sub(
+        r'http\S+|www\S+|@\w+|#\w+|[^a-zA-Z\s]',
+        '',
+        text
+    )
+
+    tokens = [
+        word for word in text.split()
+        if word not in stop_words
+    ]
+
+    return " ".join(tokens)
+
 
 if __name__ == "__main__":
-    # --- MLflow Setup ---
+
+    print("Starting Airline Sentiment Training Pipeline...")
+
+    # MLflow Setup
     mlflow.set_experiment("Airline_Sentiment_Analysis")
-    # autolog() tracks parameters like n_estimators automatically
-    mlflow.sklearn.autolog() 
+    mlflow.sklearn.autolog()
 
-    # 1. Setup & Data Loading
-    # Ensure Tweets.csv is in the same directory
-    if not os.path.exists('Tweets.csv'):
-        raise FileNotFoundError("Tweets.csv not found! Please ensure it is in the project root.")
+    # Check dataset
+    if not os.path.exists("Tweets.csv"):
+        raise FileNotFoundError(
+            "Tweets.csv not found in project directory."
+        )
 
-    df = pd.read_csv('Tweets.csv')
-    df['cleaned_text'] = df['text'].apply(clean_text)
+    # Load dataset
+    df = pd.read_csv("Tweets.csv")
 
-    X = df['cleaned_text']
-    y = df['airline_sentiment']
+    # Verify required columns
+    required_columns = ["text", "airline_sentiment"]
 
-    # 2. Split Data (80% Train, 20% Test)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    for column in required_columns:
+        if column not in df.columns:
+            raise ValueError(
+                f"Required column '{column}' not found in dataset."
+            )
+
+    print(f"Dataset Shape: {df.shape}")
+
+    # Clean text
+    df["cleaned_text"] = df["text"].apply(clean_text)
+
+    X = df["cleaned_text"]
+    y = df["airline_sentiment"]
+
+    # Train/Test Split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.20,
+        random_state=42,
+        stratify=y
+    )
 
     with mlflow.start_run(run_name="RandomForest_Pipeline_Run") as run:
-        # 3. Create a Pipeline 
-        # This bundles the vectorizer and model into one object
+
+        # Build Pipeline
         pipeline = Pipeline([
-            ('tfidf', TfidfVectorizer(max_features=2500)),
-            ('rf', RandomForestClassifier(n_estimators=200, n_jobs=-1))
+            (
+                "tfidf",
+                TfidfVectorizer(max_features=2500)
+            ),
+            (
+                "rf",
+                RandomForestClassifier(
+                    n_estimators=200,
+                    random_state=42,
+                    n_jobs=-1
+                )
+            )
         ])
 
-        # 4. Model Training
+        # Train
         pipeline.fit(X_train, y_train)
-        
-        # 5. Evaluation
+
+        # Predict
         y_pred = pipeline.predict(X_test)
+
+        # Accuracy
         accuracy = accuracy_score(y_test, y_pred)
-        
-        # Manually log the metric (though autolog does some of this)
-        mlflow.log_metric("accuracy", accuracy) 
-        print(f"Model Accuracy: {accuracy * 100:.2f}%")
-        
-        # 6. Log the entire Pipeline to MLflow
-        # This allows you to deploy directly from MLflow later
-        mlflow.sklearn.log_model(pipeline, artifact_path="model")
-        
-        # 7. Save locally for your Docker/Flask setup
-        import pickle
-        with open('model_pipeline.pkl', 'wb') as f:
+
+        print(f"\nAccuracy: {accuracy:.4f}")
+
+        # Classification Report
+        print("\nClassification Report:")
+        print(classification_report(y_test, y_pred))
+
+        # Log metric
+        mlflow.log_metric("accuracy", accuracy)
+
+        # Log model
+        mlflow.sklearn.log_model(
+            pipeline,
+            artifact_path="model"
+        )
+
+        # Save pipeline locally
+        with open("model_pipeline.pkl", "wb") as f:
             pickle.dump(pipeline, f)
 
-        print(f"Run ID: {run.info.run_id}")
-        print("Model and Pipeline tracked in MLflow and saved as model_pipeline.pkl!")
+        print("\nModel saved as model_pipeline.pkl")
+        print(f"MLflow Run ID: {run.info.run_id}")
+        print("Training completed successfully.")
