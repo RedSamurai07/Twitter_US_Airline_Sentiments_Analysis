@@ -15,6 +15,7 @@ jobs:
 
     defaults:
       run:
+        # 📂 Forces every step below to execute inside your project subfolder
         working-directory: ./airline-sentiment-project
 
     steps:
@@ -31,7 +32,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    # ⬇️ The MLOps Trick: Generates a tiny, valid 5KB model automatically in the runner cloud
+    # 🤖 Automatically creates a lightweight mock model pipeline for CI evaluation
     - name: Generate Lightweight Dummy Model for Testing
       run: |
         python -c "

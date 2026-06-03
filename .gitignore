@@ -29,3 +29,7 @@ htmlcov/
 .DS_Store
 mlflow_data.zip
 project.zip
+*.zip
+*.pkl
+mlruns/
+airline-sentiment-project/model_pipeline.pkl
