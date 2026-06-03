@@ -3,6 +3,7 @@
 
 ## Table of contents
 - [Project Overview](#project-overview)
+- [Production Architecture](#production-architecture)
 - [Executive Summary](#executive-summary)
 - [Goal](goal)
 - [Data Structure](data-structure)
@@ -13,6 +14,11 @@
 
 ### Project Overview
 - This project focuses on analyzing customer feedback from Twitter to understand sentiment towards major airlines. The dataset provides pre-classified sentiments (positive, neutral, negative) and, for negative feedback, specific reasons for dissatisfaction. This analysis aims to provide actionable insights for airlines to enhance customer service and operational efficiency.
+
+### Production Architecture
+
+
+
 
 ### Executive Summary
 - This analysis of Twitter interactions provides critical insights into customer sentiment, common pain points, and behavioral patterns, equipping various airline departments with actionable intelligence to enhance service, optimize operations, and refine strategic initiatives.
