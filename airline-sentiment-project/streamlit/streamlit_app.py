@@ -4,54 +4,72 @@ import re
 import nltk
 from nltk.corpus import stopwords
 import urllib.request
+import tensorflow as tf
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+import numpy as np
+import os
 
 # 1. Page Configuration
 st.set_page_config(page_title="Twitter US Airline Sentiment Analysis", layout="centered")
 st.title("✈️ US Airline Sentiment Predictor")
 st.markdown("Enter a tweet or airline review below to evaluate customer sentiment.")
 
-# Your live Dropbox URL to the 123MB model pipeline file
-DROPBOX_URL = "https://www.dropbox.com/scl/fi/htun6y9crwzw0fdfqx6tm/model_pipeline.pkl?rlkey=g5dwk2ed686axjpwmnifodw9r&st=y8lag9nn&dl=1"
+# 🔗 PASTE YOUR DROPBOX LINKS HERE (Ensure they all end in dl=1)
+NN_MODEL_URL = "https://www.dropbox.com/scl/fi/4ydvvmtekzqfo6lwvl0uz/nn_model.keras?rlkey=kze33ukbfkxtgog6i9gj66uw9&st=fio3apnj&dl=1"
+TOKENIZER_URL = "https://www.dropbox.com/scl/fi/7jpbrzonhixd3kl65gjju/tokenizer.pkl?rlkey=nkifa5ov0bn2u428zi3amzqyt&st=5eyhpl29&dl=1"
+LABEL_ENCODER_URL = "https://www.dropbox.com/scl/fi/qibv0eqzq4xhvwxh00izz/label_encoder.pkl?rlkey=j3w18yynzq7qajafhlhox3jen&st=m4t83o8d&dl=1"
 
-# 2. Quietly download NLTK dependencies and cache them
+# 2. Downloading all NLTK dependencies
 @st.cache_resource
 def download_nltk_dependencies():
     nltk.download('stopwords', quiet=True)
+    from nltk.corpus import stopwords  
     return set(stopwords.words('english'))
 
 stop_words = download_nltk_dependencies()
 
-# 3. Download the large model from Dropbox directly into cache memory
+# 3. Load all Neural Network Assets from Cloud Storage into Cache Memory
 @st.cache_resource
-def load_pipeline_from_url(url):
+def load_cloud_assets(model_url, tokenizer_url, encoder_url):
     try:
-        # Request configuration to bypass basic firewalls
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
-        with urllib.request.urlopen(req) as response:
-            return pickle.loads(response.read())
+        temp_model_path = "temp_model.keras"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        
+        # Download the .keras network model structure
+        req_model = urllib.request.Request(model_url, headers=headers)
+        with urllib.request.urlopen(req_model) as response, open(temp_model_path, 'wb') as out_file:
+            out_file.write(response.read())
+        nn_model = tf.keras.models.load_model(temp_model_path)
+        
+        if os.path.exists(temp_model_path):
+            os.remove(temp_model_path)
+            
+        # Download Tokenizer
+        req_tok = urllib.request.Request(tokenizer_url, headers=headers)
+        with urllib.request.urlopen(req_tok) as response:
+            tokenizer = pickle.loads(response.read())
+            
+        # Download Label Encoder
+        req_enc = urllib.request.Request(encoder_url, headers=headers)
+        with urllib.request.urlopen(req_enc) as response:
+            label_encoder = pickle.loads(response.read())
+            
+        return nn_model, tokenizer, label_encoder
     except Exception as e:
-        st.error(f"⚠️ Failed to download model from cloud storage: {e}")
-        return None
+        st.error(f"⚠️ Deep Learning Asset Download Failed: {e}")
+        return None, None, None
 
-# Spinner ensures the user knows it's downloading the large file on first startup
-with st.spinner("📦 Fetching machine learning model from cloud storage... (Takes a few seconds on first load)"):
-    model_pipeline = load_pipeline_from_url(DROPBOX_URL)
+with st.spinner("🧠 Reassembling Neural Network layers... (Takes a minute on first load)"):
+    model, tokenizer, le = load_cloud_assets(NN_MODEL_URL, TOKENIZER_URL, LABEL_ENCODER_URL)
 
-if model_pipeline is None:
-    st.markdown("### 🔍 Troubleshooting Tips:")
-    st.write("1. Check if the Dropbox link has expired or changed.")
-    st.write("2. Make sure your `requirements.txt` includes the exact versions of the machine learning libraries you trained the model with (like `scikit-learn`).")
+if model is None or tokenizer is None or le is None:
     st.stop()
 
-# 4. Text Preprocessing Function
+# 4. Text Preprocessing
 def clean_text(text):
     if not isinstance(text, str):
         return ""
     text = text.lower()
-    # Remove URLs, Mentions, Hashtags, and special characters
     text = re.sub(r'http\S+|@\w+|\#\w+|[^a-zA-Z\s]', '', text)
     tokens = [word for word in text.split() if word not in stop_words]
     return " ".join(tokens)
@@ -59,22 +77,20 @@ def clean_text(text):
 # 5. User Interface Setup
 user_review = st.text_area("Review Text:", placeholder="Type your airline review here...")
 
-# Purely informational phrases that indicate a neutral question
-NEUTRAL_KEYWORDS = ["what is", "status of", "flight status", "is it departing", "gate number", "timings", "delayed or on time"]
-
 if st.button("Analyze Sentiment", type="primary"):
     if user_review.strip() != "":
-        # Clean the text input matching the model training expectations
         cleaned = clean_text(user_review)
-        lower_review = user_review.lower()
         
-        # Rule 1: Catch purely informational questions before passing to the biased model
-        if any(keyword in lower_review for keyword in NEUTRAL_KEYWORDS) or ("?" in lower_review and not any(bad_word in lower_review for bad_word in ["worst", "delay", "lost", "bad", "hate", "thank", "love", "great"])):
-            prediction_str = "neutral"
-        else:
-            # Fall back to your ML model pipeline prediction if it's an assertive statement
-            prediction = model_pipeline.predict([cleaned])[0]
-            prediction_str = str(prediction).strip().lower()
+        # Tokenize and Pad the string sequence just like your notebook does
+        seq = tokenizer.texts_to_sequences([cleaned])
+        padded = pad_sequences(seq, maxlen=50) # Change 50 to match your notebook's max_len if different
+        
+        # Run prediction through Neural Network layers
+        pred_probs = model.predict(padded)
+        pred_class_idx = np.argmax(pred_probs, axis=1)
+        
+        # Map back to string class dynamically ('positive', 'neutral', 'negative')
+        prediction_str = str(le.inverse_transform(pred_class_idx)[0]).strip().lower()
         
         # Render clean metric visualization blocks
         st.subheader("Analysis Result:")
