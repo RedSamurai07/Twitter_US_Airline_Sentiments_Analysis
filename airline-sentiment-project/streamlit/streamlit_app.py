@@ -59,14 +59,22 @@ def clean_text(text):
 # 5. User Interface Setup
 user_review = st.text_area("Review Text:", placeholder="Type your airline review here...")
 
+# Purely informational phrases that indicate a neutral question
+NEUTRAL_KEYWORDS = ["what is", "status of", "flight status", "is it departing", "gate number", "timings", "delayed or on time"]
+
 if st.button("Analyze Sentiment", type="primary"):
     if user_review.strip() != "":
         # Clean the text input matching the model training expectations
         cleaned = clean_text(user_review)
+        lower_review = user_review.lower()
         
-        # Predict using the cached remote model pipeline
-        prediction = model_pipeline.predict([cleaned])[0]
-        prediction_str = str(prediction).strip().lower()
+        # Rule 1: Catch purely informational questions before passing to the biased model
+        if any(keyword in lower_review for keyword in NEUTRAL_KEYWORDS) or ("?" in lower_review and not any(bad_word in lower_review for bad_word in ["worst", "delay", "lost", "bad", "hate", "thank", "love", "great"])):
+            prediction_str = "neutral"
+        else:
+            # Fall back to your ML model pipeline prediction if it's an assertive statement
+            prediction = model_pipeline.predict([cleaned])[0]
+            prediction_str = str(prediction).strip().lower()
         
         # Render clean metric visualization blocks
         st.subheader("Analysis Result:")
