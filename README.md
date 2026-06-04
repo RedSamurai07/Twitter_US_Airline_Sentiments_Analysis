@@ -78,7 +78,7 @@ Data Source: Primary dataset collected via custom web-scraping scripts [or API i
 ### Tools
 - Excel : Google Sheets - Check for data types, Table formatting
 - Tableau: Visualization
-- Python: VS code / Google Colab - Data Preparation and pre-processing, Exploratory Data Analysis, Descriptive Statistics, inferential Statistics, Data manipulation, Data Visualization, Feature Engineering, Hypothesis Testing, Machine learning, Deep learning, Tokenization, Model Training and evaluation, Model development.
+- Python: VS code IDE - Data Preparation and pre-processing, Exploratory Data Analysis, Descriptive Statistics, inferential Statistics, Data manipulation, Data Visualization, Feature Engineering, Hypothesis Testing, Machine learning, Deep learning, Tokenization, Model Training and evaluation, Model development.
 - Model Deployment: Docker, EC2, MLflow
 - CI/CD: GitHub Actions
 - Version Control: Git
