@@ -1,8 +1,22 @@
 # Twitter US Airline Sentiments Analysis ✈️
 [![Python application test with pytest](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions/workflows/test.yml/badge.svg)](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions)
 
+## Table of contents
+- [Project Overview](#project-overview)
+- [Project Architecture](#project-architecture)
+- [Production Architecture](#production-architecture)
+- [Executive Summary](#executive-summary)
+- [Goal](goal)
+- [Data Structure](data-structure)
+- [Tools](tools)
+- [Analysis](#analysis)
+- [Insights](insights)
+- [Recommendations](recommendations)
 
-### 🏗️ Project Architecture & Workflow
+### Project Overview
+- This project focuses on analyzing customer feedback from Twitter to understand sentiment towards major airlines. The dataset provides pre-classified sentiments (positive, neutral, negative) and, for negative feedback, specific reasons for dissatisfaction. This analysis aims to provide actionable insights for airlines to enhance customer service and operational efficiency.
+
+### Project Architecture
 
 ```mermaid
 graph LR
@@ -30,19 +44,6 @@ graph LR
     style G fill:#FF9900,stroke:#333,stroke-width:2px,color:#fff
 ```
 
-## Table of contents
-- [Project Overview](#project-overview)
-- [Production Architecture](#production-architecture)
-- [Executive Summary](#executive-summary)
-- [Goal](goal)
-- [Data Structure](data-structure)
-- [Tools](tools)
-- [Analysis](#analysis)
-- [Insights](insights)
-- [Recommendations](recommendations)
-
-### Project Overview
-- This project focuses on analyzing customer feedback from Twitter to understand sentiment towards major airlines. The dataset provides pre-classified sentiments (positive, neutral, negative) and, for negative feedback, specific reasons for dissatisfaction. This analysis aims to provide actionable insights for airlines to enhance customer service and operational efficiency.
 
 ### Production Architecture
 To demonstrate production readiness, this Sentiment Analysis framework is fully productized and automated:
@@ -1421,34 +1422,6 @@ print(classification_report(y_test, y_pred, target_names=le.classes_))
 <img width="557" height="326" alt="image" src="https://github.com/user-attachments/assets/23c3b665-88d5-482b-a9a8-8dca52795f13" />
 
 We notice our model performs well about 80% and the reason I haven't fine tuned it as the model performance will decrease and rely on the majority classes and missclassification of sentiments will take place. We can conclude that deep neural network like LSTM perfromed well than other machine learning models.
-
-
-Model Deployment Guide:
-
-Stage 1: Setting Up Your Local Environment
-Begin your journey by establishing a development workspace on your computer before anything goes online. Get Python & Pip: Obtain the most recent 3.x release from python.org and confirm installation by entering python --version in your command line. Get Git: Acquire Git and register for a GitHub account, then execute git config --global user.name "Your Name" to connect your system to your profile. Get Docker Desktop: This critical software lets you bundle your application to ensure consistent behavior across your laptop and production servers. While setting this up, register for Docker Hub—it will serve as your "Container Repository."
-
-Stage 2: Organizing Your Workspace (Code & Dependencies)
-Structure your machine learning application properly. Build a Project Directory: Execute mkdir my-ml-app && cd my-ml-app. Configure a Virtual Environment: Execute python -m venv venv and activate using source venv/bin/activate (Mac) or .\venv\Scripts\activate (Windows).
-Purpose? This prevents conflicts between ML frameworks (such as Scikit-Learn or PyTorch) across different projects. Generate a requirements.txt: Document your dependencies here (examples: pandas, scikit-learn, flask). Deploy them via pip install -r requirements.txt. Prior to this, capture package versions by running pip list in your terminal.
-
-Stage 3: Packaging for Distribution (Containerization & Repository)
-Your code is ready; now package it for transport. Develop a Dockerfile: This script instructs Docker to fetch Python, transfer your codebase, install dependencies, and launch the model. Construct your Image: Execute docker build -t my-ml-model. Upload to Repository: Authenticate with Docker Hub through your terminal (docker login) and upload your image for cloud accessibility: docker push username/my-ml-model. Important: Within the Dockerfile, verify Python tags at hub.docker.com/_/python for containerization compatibility.
-
-tage 4: Production Launch & Workflow Automation
-Manual deployment is outdated; professionals employ automation to synchronize the production application with the source code. Cloud Infrastructure: Select a platform (such as GCP or AWS) to host your model permanently online. CI/CD Framework: Implement GitHub Actions to automate the build and deployment workflow. Each code commit to GitHub triggers automatic cloud updates. Basic Monitoring: Leverage your provider's native tools to track server performance and resource consumption.
-
-Stage 5: Cloud Infrastructure & Continuous Integration (Deployment & CI/CD)
-This stage brings your project into production. Cloud Platform Account (AWS/GCP/Azure): Choose one provider. Newcomers often find Google Cloud (GCP) or DigitalOcean more user-friendly than AWS. CI/CD (GitHub Actions): First, create a test.py file for model validation and metric visualization on MLflow.
-
-Establish a directory in your project: .github/workflows/ and within it:
-Include a .yml configuration that triggers: "Upon each GitHub code push, reconstruct my Docker image and deploy to the cloud."
-Monitoring: After the model runs on cloud infrastructure, utilize the provider's dashboard (like AWS CloudWatch) to detect errors or excessive CPU consumption.
-
-Stage 5: Performance Monitoring (Prometheus & Grafana):
-The final verification layer.
-1). Prometheus: Collects metrics from your deployed model (traffic volume, crash reports).
-2). Grafana: Interfaces with Prometheus to display dynamic, visual dashboards of your model's performance.
 
 ### Insights
 Based on the analysis from Twitter interactions regarding the airlines is mentioned bekow
