@@ -114,4 +114,4 @@ http://<EC2_PUBLIC_IP>:5000
 ## CI/CD Pipeline Status
 The operational integrity of the master codebase is continuously protected via automated integration testing gates:
 
-![CI Status](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions/workflows/test.yml/badge.svg)
+[![Python application test with pytest](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions/workflows/test.yml/badge.svg)](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions)
