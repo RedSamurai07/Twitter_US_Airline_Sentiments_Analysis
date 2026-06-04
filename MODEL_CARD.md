@@ -34,7 +34,7 @@ Out-of-Scope: This model is not intended for automated social media moderation o
 
    - Bias: The model was trained on historical data. If the underlying data contains biases related to specific airline demographics or region-based language, the model may propagate these biases.
 
-   - Data Drift: Sentiment language evolves rapidly. Without a scheduled retraining pipeline (outlined in the Deployment Roadmap), model performance is expected to decay over time.
+   - Data Drift: Sentiment language evolves rapidly. Without a scheduled retraining pipeline (outlined in the [Deployment Roadmap](DEPLOYMENT.md)), model performance is expected to decay over time.
 
 ## 6. Operational Guardrails
 
