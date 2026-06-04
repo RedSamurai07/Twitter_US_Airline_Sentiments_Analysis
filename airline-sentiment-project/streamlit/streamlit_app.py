@@ -3,12 +3,15 @@ import pickle
 import re
 import nltk
 from nltk.corpus import stopwords
-import os
+import urllib.request
 
 # 1. Page Configuration
 st.set_page_config(page_title="Twitter US Airline Sentiment Analysis", layout="centered")
 st.title("✈️ US Airline Sentiment Predictor")
 st.markdown("Enter a tweet or airline review below to evaluate customer sentiment.")
+
+# Your live Dropbox URL to the 123MB model pipeline file
+DROPBOX_URL = "https://www.dropbox.com/scl/fi/htun6y9crwzw0fdfqx6tm/model_pipeline.pkl?rlkey=g5dwk2ed686axjpwmnifodw9r&st=y8lag9nn&dl=1"
 
 # 2. Quietly download NLTK dependencies and cache them
 @st.cache_resource
@@ -18,19 +21,29 @@ def download_nltk_dependencies():
 
 stop_words = download_nltk_dependencies()
 
-# 3. Cached Model Loading
+# 3. Download the large model from Dropbox directly into cache memory
 @st.cache_resource
-def load_pipeline():
-    # Since model_pipeline.pkl is in the exact same folder as app.py,
-    # we use a relative path.
-    model_path = os.path.join(os.path.dirname(__file__), 'model_pipeline.pkl')
-    with open(model_path, 'rb') as f:
-        return pickle.load(f)
+def load_pipeline_from_url(url):
+    try:
+        # Request configuration to bypass basic firewalls
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(req) as response:
+            return pickle.loads(response.read())
+    except Exception as e:
+        st.error(f"⚠️ Failed to download model from cloud storage: {e}")
+        return None
 
-try:
-    model_pipeline = load_pipeline()
-except FileNotFoundError:
-    st.error("⚠️ Critical Error: 'model_pipeline.pkl' was not found in the streamlit folder!")
+# Spinner ensures the user knows it's downloading the large file on first startup
+with st.spinner("📦 Fetching machine learning model from cloud storage... (Takes a few seconds on first load)"):
+    model_pipeline = load_pipeline_from_url(DROPBOX_URL)
+
+if model_pipeline is None:
+    st.markdown("### 🔍 Troubleshooting Tips:")
+    st.write("1. Check if the Dropbox link has expired or changed.")
+    st.write("2. Make sure your `requirements.txt` includes the exact versions of the machine learning libraries you trained the model with (like `scikit-learn`).")
     st.stop()
 
 # 4. Text Preprocessing Function
@@ -43,21 +56,19 @@ def clean_text(text):
     tokens = [word for word in text.split() if word not in stop_words]
     return " ".join(tokens)
 
-# 5. User Interface
+# 5. User Interface Setup
 user_review = st.text_area("Review Text:", placeholder="Type your airline review here...")
 
 if st.button("Analyze Sentiment", type="primary"):
     if user_review.strip() != "":
-        # Clean the input text
+        # Clean the text input matching the model training expectations
         cleaned = clean_text(user_review)
         
-        # Predict using your model pipeline
+        # Predict using the cached remote model pipeline
         prediction = model_pipeline.predict([cleaned])[0]
-        
-        # Format the output label string cleanly (handling both upper/lowercase models)
         prediction_str = str(prediction).strip().lower()
         
-        # Display Results
+        # Render clean metric visualization blocks
         st.subheader("Analysis Result:")
         if "pos" in prediction_str:
             st.success("🟢 Positive Sentiment")
