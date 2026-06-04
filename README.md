@@ -2,6 +2,34 @@
 [![Python application test with pytest](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions/workflows/test.yml/badge.svg)](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions)
 
 
+### 🏗️ Project Architecture & Workflow
+
+```mermaid
+graph LR
+    subgraph Development [1. Data & Modeling]
+        A[Tweets.csv Data] --> B[Hypothesis Testing & Statsmodels]
+        B --> C[Machine Learning / Deep Learning Models]
+    end
+
+    subgraph Tracking [2. Experimentation]
+        C --> D((MLflow Tracking))
+    end
+
+    subgraph DevOps [3. CI/CD & Containers]
+        D --> E[GitHub Actions CI/CD]
+        E --> F[Docker Containerization]
+    end
+
+    subgraph Deployment [4. Production]
+        F --> G[AWS Cloud Deployment]
+    end
+
+    style D fill:#012A4A,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#2671E5,stroke:#333,stroke-width:2px,color:#fff
+    style F fill:#0db7ed,stroke:#333,stroke-width:2px,color:#fff
+    style G fill:#FF9900,stroke:#333,stroke-width:2px,color:#fff
+```
+
 ## Table of contents
 - [Project Overview](#project-overview)
 - [Production Architecture](#production-architecture)
