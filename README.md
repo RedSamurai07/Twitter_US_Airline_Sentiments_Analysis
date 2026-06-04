@@ -1,6 +1,7 @@
 # Twitter US Airline Sentiments Analysis ✈️
 [![Python application test with pytest](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions/workflows/test.yml/badge.svg)](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions)
 
+
 ## Table of contents
 - [Project Overview](#project-overview)
 - [Production Architecture](#production-architecture)
