@@ -46,7 +46,6 @@ def test_get_resources_cached():
     app_module.stop_words = set()
     m, tok, enc, sw = app_module.get_resources()
     assert m == "fake"
-    # restore
     app_module.model, app_module.tokenizer, \
         app_module.le, app_module.stop_words = original
 
@@ -59,28 +58,28 @@ def test_initialize_resources_exception_branch():
     assert enc is None
     assert isinstance(sw, set)
 
-@patch('app.get_resources')
-def test_predict_success(client, mock_res):
+def test_predict_success(client):
     mock_model = MagicMock()
     mock_model.predict.return_value = np.array([[0.1, 0.7, 0.2]])
     mock_tokenizer = MagicMock()
     mock_tokenizer.texts_to_sequences.return_value = [[1, 2, 3]]
     mock_le = MagicMock()
     mock_le.inverse_transform.return_value = ['positive']
-    mock_res.return_value = (mock_model, mock_tokenizer, mock_le, set())
-    res = client.post('/predict', json={'tweet': 'I love this airline!'})
+
+    with patch('app.get_resources', return_value=(mock_model, mock_tokenizer, mock_le, set())):
+        res = client.post('/predict', json={'tweet': 'I love this airline!'})
     assert res.status_code == 200
     assert res.json['sentiment'] == 'positive'
 
-@patch('app.get_resources')
-def test_predict_negative_sentiment(client, mock_res):
+def test_predict_negative_sentiment(client):
     mock_model = MagicMock()
     mock_model.predict.return_value = np.array([[0.8, 0.1, 0.1]])
     mock_tokenizer = MagicMock()
     mock_tokenizer.texts_to_sequences.return_value = [[5, 6]]
     mock_le = MagicMock()
     mock_le.inverse_transform.return_value = ['negative']
-    mock_res.return_value = (mock_model, mock_tokenizer, mock_le, set())
-    res = client.post('/predict', json={'tweet': 'Terrible flight, never again'})
+
+    with patch('app.get_resources', return_value=(mock_model, mock_tokenizer, mock_le, set())):
+        res = client.post('/predict', json={'tweet': 'Terrible flight, never again'})
     assert res.status_code == 200
     assert res.json['sentiment'] == 'negative'
