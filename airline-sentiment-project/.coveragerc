@@ -1,0 +1,9 @@
+[run]
+branch = True
+omit =
+    train.py
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
+    app.run

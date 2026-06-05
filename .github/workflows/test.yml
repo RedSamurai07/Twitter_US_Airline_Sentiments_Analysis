@@ -33,9 +33,9 @@ jobs:
 
     - name: Test with pytest
       run: |
-        # Using --cov-branch to track conditional logic (if/else) for better accuracy
         pytest airline-sentiment-project/test_logic.py \
           --cov=airline-sentiment-project \
+          --cov-config=airline-sentiment-project/.coveragerc \
           --cov-branch \
           --cov-report=xml \
           --cov-fail-under=80
