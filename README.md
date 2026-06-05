@@ -1,6 +1,8 @@
 # Twitter US Airline Sentiments Analysis ✈️
 [![Python application test with pytest](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions/workflows/test.yml/badge.svg)](https://github.com/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/actions)
 
+[![codecov](https://codecov.io/gh/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis/graph/badge.svg)](https://codecov.io/gh/RedSamurai07/Twitter_US_Airline_Sentiments_Analysis)
+
 [Live Link](https://twitterusairlinesentimentsanalysis-cm6xlenrkvdosevattlrgf.streamlit.app/)
 ## Table of contents
 - [Project Overview](#project-overview)
