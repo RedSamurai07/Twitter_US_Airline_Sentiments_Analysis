@@ -4,20 +4,13 @@ from unittest.mock import patch, MagicMock
 import numpy as np
 from app import app, clean_text
 
-@pytest.fixture(autouse=True)
-def reset_globals():
-    """Reset lazy globals before each test to ensure clean state."""
-    app_module.model = None
-    app_module.tokenizer = None
-    app_module.le = None
-    app_module.stop_words = None
-    yield
-
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
+
+# --- clean_text tests ---
 
 def test_clean_text_basic():
     assert clean_text("Hello @user! http://test.com") == "hello"
@@ -28,6 +21,8 @@ def test_clean_text_non_string():
 def test_clean_text_removes_hashtag():
     result = clean_text("great flight #awesome")
     assert "#awesome" not in result
+
+# --- Route tests ---
 
 def test_health(client):
     resp = client.get('/health')
@@ -41,22 +36,28 @@ def test_predict_no_body(client):
     resp = client.post('/predict', content_type='application/json', data='{}')
     assert resp.status_code == 400
 
-def test_get_resources_graceful_fallback():
-    """Covers initialize_resources() exception branch — no model files in CI."""
-    m, tok, enc, sw = app_module.get_resources()
-    assert m is None        # files don't exist in CI
-    assert tok is None
-    assert enc is None
-    assert isinstance(sw, set)  # stopwords still loaded
-
 def test_get_resources_cached():
     """Covers the 'model is not None' branch of get_resources()."""
+    original = (app_module.model, app_module.tokenizer,
+                app_module.le, app_module.stop_words)
     app_module.model = "fake"
     app_module.tokenizer = "fake"
     app_module.le = "fake"
     app_module.stop_words = set()
     m, tok, enc, sw = app_module.get_resources()
     assert m == "fake"
+    # restore
+    app_module.model, app_module.tokenizer, \
+        app_module.le, app_module.stop_words = original
+
+def test_initialize_resources_exception_branch():
+    """Covers the except branch by patching load_model to raise."""
+    with patch('app.load_model', side_effect=Exception("no file")):
+        m, tok, enc, sw = app_module.initialize_resources()
+    assert m is None
+    assert tok is None
+    assert enc is None
+    assert isinstance(sw, set)
 
 @patch('app.get_resources')
 def test_predict_success(client, mock_res):

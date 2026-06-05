@@ -2,6 +2,7 @@
 branch = True
 omit =
     train.py
+    test_logic.py
 
 [report]
 exclude_lines =
