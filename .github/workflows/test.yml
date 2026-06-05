@@ -30,8 +30,11 @@ jobs:
 
     - name: Test with pytest
       run: |
-        # Targeting your specific project directory for tests and coverage analysis
-        pytest airline-sentiment-project/test_logic.py --cov=airline-sentiment-project --cov-report=xml
+        # Using --cov-branch to track conditional logic (if/else) for better accuracy
+        pytest airline-sentiment-project/test_logic.py \
+          --cov=airline-sentiment-project \
+          --cov-branch \
+          --cov-report=xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5

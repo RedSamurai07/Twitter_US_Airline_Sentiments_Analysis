@@ -2,29 +2,27 @@ from flask import Flask, request, jsonify
 import pickle
 import re
 import nltk
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 from nltk.corpus import stopwords
 
 app = Flask(__name__)
 
-# 1. Initialization Function
-# This allows tests to import 'app' without loading the model every time
+# Load artifacts safely
 def initialize_resources():
     nltk.download('stopwords', quiet=True)
-    with open('model_pipeline.pkl', 'rb') as f:
-        pipeline = pickle.load(f)
-    return pipeline, set(stopwords.words('english'))
+    model = load_model('nn_model.keras')
+    with open('tokenizer.pkl', 'rb') as f: tokenizer = pickle.load(f)
+    with open('label_encoder.pkl', 'rb') as f: le = pickle.load(f)
+    return model, tokenizer, le, set(stopwords.words('english'))
 
-# Initialize once globally
-model_pipeline, stop_words = initialize_resources()
+# Global scope
+model, tokenizer, le, stop_words = initialize_resources()
 
 def clean_text(text):
-    """Standardizes input text."""
-    if not isinstance(text, str):
-        return ""
-    text = text.lower()
-    text = re.sub(r'http\S+|@\w+|#\w+|[^a-zA-Z\s]', '', text)
-    tokens = [word for word in text.split() if word not in stop_words]
-    return " ".join(tokens)
+    if not isinstance(text, str): return ""
+    text = re.sub(r'http\S+|@\w+|#\w+|[^a-zA-Z\s]', '', text.lower())
+    return " ".join([w for w in text.split() if w not in stop_words])
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -36,16 +34,10 @@ def predict():
     if not data or 'tweet' not in data:
         return jsonify({'error': 'No tweet provided'}), 400
     
-    raw_tweet = data['tweet']
-    cleaned_tweet = clean_text(raw_tweet)
+    cleaned = clean_text(data['tweet'])
+    seq = pad_sequences(tokenizer.texts_to_sequences([cleaned]), maxlen=50)
     
-    # Predict using the Pipeline
-    prediction = model_pipeline.predict([cleaned_tweet])[0]
+    prediction = model.predict(seq).argmax(axis=1)
+    sentiment = le.inverse_transform(prediction)[0]
     
-    return jsonify({
-        'tweet': raw_tweet,
-        'sentiment': str(prediction)
-    })
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    return jsonify({'tweet': data['tweet'], 'sentiment': str(sentiment)})
