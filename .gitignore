@@ -4,11 +4,7 @@
 *.h5
 *.pth
 *.onnx
-
-# Data
-# Since we copy Tweets.csv to Docker, we keep it in repo if needed, 
-# but usually large CSVs should be ignored too.
-# Tweets.csv
+*.keras
 
 # MLflow
 mlruns/
@@ -31,3 +27,5 @@ mlflow_data.zip
 project.zip
 *.zip
 
+# Data
+Data/raw
