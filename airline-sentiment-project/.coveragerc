@@ -1,10 +1,16 @@
 [run]
 branch = True
+source = .
 omit =
     train.py
-    test_logic.py
+    tests/test_logic.py
+    models/*
+    Data/*
 
 [report]
 exclude_lines =
     if __name__ == .__main__.:
     app.run
+
+[xml]
+output = coverage.xml
