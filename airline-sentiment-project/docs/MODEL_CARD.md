@@ -128,6 +128,7 @@ def comprehensive_clean(text):
 
 ## 6. Methodology & Pipeline Architecture
 
+```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        1. DATA LAYER                                │
 │  Tweets.csv (14,640 tweets | 6 US airlines | Feb 2015)              │
@@ -197,7 +198,7 @@ def comprehensive_clean(text):
 │  ├── Streamlit frontend (Streamlit Cloud)                           │
 │  └── MLflow artifact registry for experiment management             │
 └─────────────────────────────────────────────────────────────────────┘
-
+```
 
 ## 7. Model Comparison
 
