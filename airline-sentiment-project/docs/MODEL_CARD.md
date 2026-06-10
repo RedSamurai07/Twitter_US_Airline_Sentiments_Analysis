@@ -126,7 +126,80 @@ def comprehensive_clean(text):
 
 ---
 
-## 6. Model Comparison
+## 6. Methodology & Pipeline Architecture
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                        1. DATA LAYER                                │
+│  Tweets.csv (14,640 tweets | 6 US airlines | Feb 2015)              │
+│         │                                                           │
+│         ▼  load_and_clean_data()                                    │
+│  Unified DataFrame (label-encoded, missing values handled)          │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────────┐
+│                     2. TEXT PREPROCESSING                           │
+│  comprehensive_clean()                                              │
+│  ├── Lowercase + URL / email removal                                │
+│  ├── @ symbol + airline handle stripping                            │
+│  ├── Punctuation removal + NLTK word tokenization                   │
+│  └── Stopword removal                                               │
+│                                                                     │
+│  Label Encoding: Negative=0 | Neutral=1 | Positive=2                │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────────┐
+│                     3. FEATURE ENGINEERING                          │
+│  ├── TF-IDF Vectorizer       → sparse matrix (ML models)            │
+│  └── Keras Tokenizer + Padding → sequences of length 50 (LSTM)      │
+│       vocab_size=5000 | maxlen=50 | embedding_dim=128               │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────────┐
+│                  4. EDA & STATISTICAL VALIDATION                    │
+│  ├── Sentiment distribution analysis (imbalance detection)          │
+│  ├── Airline-level breakdown (negative reasons, volumes)            │
+│  ├── Geographic & temporal pattern analysis                         │
+│  └── 6 Hypothesis tests (Chi-Square, ANOVA, Pearson, Tukey HSD)     │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────────┐
+│                     5. MODEL TRAINING                               │
+│  Train/Test Split: 70% train | 30% test                             │
+│  class_weight='balanced' applied to all models                      │
+│                                                                     │
+│  ├── Baseline: Gaussian NB / Multinomial NB (TF-IDF)                │
+│  ├── Classical: Logistic Regression, Linear SVM, Random Forest      │
+│  └── Production: LSTM (TensorFlow/Keras)                            │
+│       Embedding(5000,128) → SpatialDropout1D(0.4)                   │
+│       → LSTM(128) → Dense(3, softmax)                               │
+│                                                                     │
+│  Loss: Sparse Categorical Crossentropy | Optimiser: Adam            │
+│  EarlyStopping: val_loss, patience=3, restore_best_weights=True     │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────────┐
+│                  6. EXPERIMENT TRACKING (MLflow)                    │
+│  Logs: params, metrics (Accuracy / F1 / Precision / Recall)         │
+│  Artifacts: nn_model.keras · tokenizer.pkl · label_encoder.pkl      │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────────┐
+│                  7. PACKAGING & CI/CD                               │
+│  ├── nn_model.keras → serialized artifact                           │
+│  ├── Docker → containerized environment (Dockerfile)                │
+│  ├── GitHub Actions → CI pipeline (Pytest + pytest-cov on push)     │
+│  └── Codecov → coverage reporting                                   │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────────┐
+│                     8. PRODUCTION SERVING                           │
+│  ├── Flask API (POST /predict, GET /health) on AWS EC2              │
+│  ├── Streamlit frontend (Streamlit Cloud)                           │
+│  └── MLflow artifact registry for experiment management             │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+## 7. Model Comparison
 
 All models trained on 70% of data (30% held out for evaluation), with `class_weight='balanced'` for imbalanced classes:
 
@@ -147,7 +220,7 @@ All models trained on 70% of data (30% held out for evaluation), with `class_wei
 
 ---
 
-## 7. Production Model — LSTM Architecture
+## 8. Production Model — LSTM Architecture
 
 ```
 Embedding(5000, 128, input_length=50)
@@ -178,7 +251,7 @@ Dense(3, activation='softmax')
 
 ---
 
-## 8. Top Negative Reasons
+## 9. Top Negative Reasons
 
 | Reason | Count |
 |---|---|
@@ -196,7 +269,7 @@ Dense(3, activation='softmax')
 
 ---
 
-## 9. Average Sentiment Confidence
+## 10. Average Sentiment Confidence
 
 | Sentiment | Avg Confidence |
 |---|---|
@@ -208,7 +281,7 @@ Dense(3, activation='softmax')
 
 ---
 
-## 10. Geographic & Temporal Analysis
+## 11. Geographic & Temporal Analysis
 
 **Top cities by negative tweet volume:**
 Washington D.C., New York City, Los Angeles, Chicago, Boston
@@ -234,7 +307,7 @@ Washington D.C., New York City, Los Angeles, Chicago, Boston
 
 ---
 
-## 11. Hypothesis Testing Results
+## 12. Hypothesis Testing Results
 
 ### Test 1 — Chi-Square: Negative Reason Distribution
 - **H₀:** Negative reasons are uniformly distributed
@@ -266,7 +339,7 @@ Washington D.C., New York City, Los Angeles, Chicago, Boston
 
 ---
 
-## 12. Flask API Endpoints
+## 13. Flask API Endpoints
 
 | Endpoint | Method | Description |
 |---|---|---|
@@ -284,7 +357,7 @@ Washington D.C., New York City, Los Angeles, Chicago, Boston
 
 ---
 
-## 13. Ethical Considerations & Limitations
+## 14. Ethical Considerations & Limitations
 
 - **Class Imbalance:** 62.7% of tweets are negative. Models may still exhibit bias toward negative classification for ambiguous tweets. `class_weight='balanced'` partially mitigates this.
 - **Temporal Scope:** All tweets are from February 2015. Airline service quality, customer expectations, and social media behaviour have changed significantly — retraining on recent data is essential.
@@ -295,7 +368,7 @@ Washington D.C., New York City, Los Angeles, Chicago, Boston
 
 ---
 
-## 14. Infrastructure & Tools
+## 15. Infrastructure & Tools
 
 | Category | Tool |
 |---|---|
@@ -318,7 +391,7 @@ Washington D.C., New York City, Los Angeles, Chicago, Boston
 
 ---
 
-## 15. Final Decision Summary
+## 16. Final Decision Summary
 
 ```
 ══════════════════════════════════════════════════════════════
