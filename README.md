@@ -86,7 +86,7 @@ To demonstrate production readiness, this Sentiment Analysis framework is fully 
   
 ### Data structure and initial checks
 
-- Twitter US Airline Sentiment dataset, originally from Crowdflower/Figure Eight.
+- [Twitter US Airline Sentiment dataset](https://www.kaggle.com/datasets/crowdflower/twitter-airline-sentiment), originally from Crowdflower/Figure Eight.
 
 - The initial checks of your Tweets.csv dataset reveal the following:
 
