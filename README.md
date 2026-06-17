@@ -86,9 +86,9 @@ To demonstrate production readiness, this Sentiment Analysis framework is fully 
   
 ### Data structure and initial checks
 
-Data Source: Primary dataset collected via custom web-scraping scripts [or API integration].
+- Twitter US Airline Sentiment dataset, originally from Crowdflower/Figure Eight.
 
- - The initial checks of your transactions.csv dataset reveal the following:
+- The initial checks of your Tweets.csv dataset reveal the following:
 
 | Features | Description | Data types |
 | -------- | -------- | -------- | 
@@ -100,10 +100,10 @@ Data Source: Primary dataset collected via custom web-scraping scripts [or API i
 | airline | The name of the airline mentioned in the tweet | object |
 | airline_sentiment_gold | Gold-standard sentiment, likely used for a small subset of hand-labeled data for validation purposes. This column contains many missing values. | object |
 | name | The Twitter handle (username) of the individual who posted the tweet. | object |
-| negativereason_gold | The full content of the tweet. This is the primary data for sentiment analysis. | object |
+| negativereason_gold | gold-standard negative-reason labels. | object |
 | retweet_count | The number of times the tweet has been retweeted. | int|  
 | text  | The full content of the tweet. This is the primary data for sentiment analysis. | object |
-|  tweet_coord | Geographic coordinates of the tweet, if available. | object |
+| tweet_coord | Geographic coordinates of the tweet, if available. | object |
 | tweet_created | The date and time when the tweet was posted. | object |
 | tweet_location | The user-provided location from which the tweet was sent. | object |
 | user_timezone | The timezone setting of the user who posted the tweet. | object |
